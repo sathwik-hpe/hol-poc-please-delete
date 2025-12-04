@@ -68,7 +68,7 @@ We provide two lab environments:
 
 ## 🖥️ Running the Labs
 
-### Option 1: Choose from Selector Page
+### Option 1: Choose from Selector Page (Recommended)
 
 1. Start the server from the main directory:
    ```bash
@@ -77,7 +77,7 @@ We provide two lab environments:
 
 2. Open your browser and go to:
    ```
-   http://localhost:8000/index-selector.html
+   http://localhost:8000
    ```
 
 3. Click on either **Real Lab** or **Simulated Lab**
