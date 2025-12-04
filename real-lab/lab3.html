@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPE Lab - Exercise 3: Generate Support Bundle</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 HPE SilverCreek Hands-On Lab</h1>
+            <p class="subtitle">Exercise 3: Generate Support Bundle</p>
+        </header>
+
+        <div class="success-banner">
+            <h2>📦 Support Bundle Generation</h2>
+            <p>Learn how to generate and download support logs for troubleshooting</p>
+        </div>
+
+        <div class="lab-content">
+            <section class="instructions">
+                <h2>Exercise 3: Generate Support Bundle</h2>
+                
+                <div class="info-box">
+                    <h3>📋 Objective</h3>
+                    <p>Generate a support bundle (log package) using the HPE SilverCreek UI. Support bundles are essential for troubleshooting and contain system logs, configurations, and diagnostic information.</p>
+                </div>
+
+                <div class="credentials-box">
+                    <h3>📊 Session Information</h3>
+                    <table>
+                        <tr>
+                            <td><strong>Logged in as:</strong></td>
+                            <td><code>admin@op360-g10s06-vm04.hstlabs.glcp.hpecorp.net</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Current Workspace:</strong></td>
+                            <td><strong>HPE CSP Operations</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Task:</strong></td>
+                            <td>Generate and Download Support Bundle</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="steps">
+                    <h3>Step-by-Step Instructions</h3>
+                    
+                    <h4>Part 1: Navigate to Support Logs</h4>
+                    <ol>
+                        <li>In your lab window, look for the <strong>"System"</strong> tab at the top-center of the page</li>
+                        <li>Click on the <strong>System</strong> tab to navigate to the System page</li>
+                        <li>On the System page, find and click the <strong>"Support logs"</strong> link</li>
+                        <li>You should now be on the <strong>Support Logs</strong> page</li>
+                    </ol>
+
+                    <h4>Part 2: Generate the Support Bundle</h4>
+                    <ol start="5">
+                        <li>On the Support Logs page, click the <strong>"Generate log"</strong> button</li>
+                        <li>A pop-up should appear saying <strong>"Support bundle generation is in progress"</strong></li>
+                        <li>You should see:
+                            <ul>
+                                <li>Start time has been recorded</li>
+                                <li>State shows as <strong>"Processing"</strong></li>
+                            </ul>
+                        </li>
+                        <li><strong>Wait approximately 15 minutes</strong> for the bundle to be generated</li>
+                        <li>The State should change to <strong>"Download Ready"</strong></li>
+                    </ol>
+
+                    <h4>Part 3: Download the Support Bundle</h4>
+                    <ol start="10">
+                        <li>Once the State shows <strong>"Download Ready"</strong>, select the bundle you want to download</li>
+                        <li>Click on <strong>Action</strong> menu (or Actions dropdown)</li>
+                        <li>Select <strong>Edit</strong> or <strong>Download</strong> from the menu</li>
+                        <li>The bundle will begin downloading (it will be a <code>.tar</code> file)</li>
+                        <li>Download time depends on the size of the bundle</li>
+                        <li>Wait for the download to complete</li>
+                    </ol>
+
+                    <h4>Part 4 (Optional): Delete Support Bundle</h4>
+                    <ol start="16">
+                        <li>To clean up, select the bundle(s) you want to delete</li>
+                        <li>Click on the <strong>Actions</strong> dropdown</li>
+                        <li>Select <strong>Delete</strong></li>
+                        <li>Confirm that you want the bundle deleted</li>
+                    </ol>
+                </div>
+
+                <div class="tips-box">
+                    <h3>💡 Important Notes</h3>
+                    <ul>
+                        <li><strong>Processing Time:</strong> Support bundle generation typically takes ~15 minutes</li>
+                        <li><strong>File Format:</strong> The output file will be <code>&lt;bundleName&gt;.tar</code></li>
+                        <li><strong>Download Size:</strong> Bundle sizes vary - larger bundles take longer to download</li>
+                        <li><strong>Multiple Bundles:</strong> You can generate and manage multiple support bundles</li>
+                        <li><strong>UI Unavailable?</strong> If the UI is not accessible, you can use CLI commands instead</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-tasks">
+                    <h3>🎯 Tasks to Complete</h3>
+                    <div class="task-list">
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>Navigate to System → Support logs</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>Click "Generate log" button</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>Verify "Support bundle generation is in progress" message appears</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>Confirm State shows as "Processing"</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>Wait for State to change to "Download Ready" (~15 min)</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>Download the support bundle (.tar file)</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>(Optional) Delete the bundle after download</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="checkpoint">
+                    <h3>✅ Checkpoint</h3>
+                    <p>Congratulations! You have successfully:</p>
+                    <ul>
+                        <li>✓ Navigated to the Support Logs page</li>
+                        <li>✓ Initiated support bundle generation</li>
+                        <li>✓ Monitored the generation progress</li>
+                        <li>✓ Downloaded the support bundle</li>
+                        <li>✓ (Optional) Cleaned up by deleting the bundle</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>🎉 Excellent work!</strong> You now know how to generate support bundles for troubleshooting!</p>
+                </div>
+
+                <div class="button-container">
+                    <button onclick="window.location.href='lab2.html'" class="back-btn">
+                        ← Back to Exercise 2
+                    </button>
+                    <button onclick="window.location.href='lab4.html'" class="continue-btn">
+                        Continue to Exercise 4: Create Backup →
+                    </button>
+                </div>
+            </section>
+
+            <section class="browser-panel">
+                <div class="browser-header">
+                    <h3>🌐 Lab Environment</h3>
+                </div>
+                
+                <div class="browser-controls">
+                    <button onclick="navigateToSupportLogs()" class="launch-window-btn">
+                        📦 Go to Support Logs Page
+                    </button>
+                </div>
+
+                <div class="browser-instructions-mini">
+                    <p><strong>💡 Quick Tip:</strong> Click the button above to navigate directly to the Support Logs page. If your session expired, you may need to log in again and select the HPE CSP Operations workspace.</p>
+                </div>
+
+                <div class="window-placeholder">
+                    <div class="placeholder-visual">
+                        <div class="window-preview">
+                            <div class="preview-header">
+                                <span class="preview-dot"></span>
+                                <span class="preview-dot"></span>
+                                <span class="preview-dot"></span>
+                            </div>
+                            <div class="preview-content">
+                                <h2>👈 Instructions</h2>
+                                <p>Follow the steps</p>
+                            </div>
+                        </div>
+                        <div class="window-arrow">↔</div>
+                        <div class="window-preview active">
+                            <div class="preview-header">
+                                <span class="preview-dot"></span>
+                                <span class="preview-dot"></span>
+                                <span class="preview-dot"></span>
+                            </div>
+                            <div class="preview-content">
+                                <h2>Support Logs 👉</h2>
+                                <p>Generate bundles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>HPE SilverCreek Hands-On Lab | Exercise 3 of 4</p>
+        </footer>
+    </div>
+
+    <script>
+        const SUPPORT_LOGS_URL = 'https://op360-g10s06-vm04.hstlabs.glcp.hpecorp.net/system/support-logs';
+        
+        function navigateToSupportLogs() {
+            // Try to reuse existing lab window
+            const labWindow = window.open('', 'HPELabEnvironment');
+            
+            if (labWindow && !labWindow.closed && labWindow.location) {
+                // Window exists, navigate to support logs page
+                labWindow.location.href = SUPPORT_LOGS_URL;
+                labWindow.focus();
+                alert('✅ Navigating to Support Logs page!\n\nFollow the exercise instructions to generate a support bundle.');
+            } else {
+                // Window doesn't exist, open new one
+                const newWindow = window.open(SUPPORT_LOGS_URL, 'HPELabEnvironment');
+                if (newWindow) {
+                    newWindow.focus();
+                    alert('✅ Opened Support Logs page!\n\nYou may need to log in again if your session expired.\n\nThen follow the exercise instructions.');
+                } else {
+                    alert('❌ Pop-up blocked! Please allow pop-ups and try again.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

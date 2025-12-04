@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 1: Login & Workspace Selection - Simulated Lab</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Exercise 1: Login & Workspace Selection</h1>
+            <div class="badge">🧪 SIMULATED ENVIRONMENT</div>
+        </div>
+
+        <div class="content">
+            <div class="intro-box">
+                <h2>📚 Welcome to the Simulated HPE SilverCreek Lab!</h2>
+                <p>This is a <strong>fully simulated environment</strong> that runs completely offline. All interactions are mock and no real system is required!</p>
+            </div>
+
+            <div class="credentials-box">
+                <h3>🔑 Dummy Login Credentials</h3>
+                <p style="margin-bottom: 15px;">Use these credentials in the simulated login page:</p>
+                <div class="credential-item">
+                    <span class="credential-label">Username:</span>
+                    <span class="credential-value">admin@silvercreek.local</span>
+                </div>
+                <div class="credential-item">
+                    <span class="credential-label">Password:</span>
+                    <span class="credential-value">Demo@123</span>
+                </div>
+            </div>
+
+            <h3>📋 Exercise Steps:</h3>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-number">1</div>
+                    <div>Click the "Open Simulated Login Page" button below</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">2</div>
+                    <div>Enter the dummy credentials provided above</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">3</div>
+                    <div>Click "Sign In" - you'll be redirected to the workspace selection page</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">4</div>
+                    <div>Select the "HPE CSP Operations" workspace</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">5</div>
+                    <div>Once logged in successfully, return here and proceed to Exercise 2</div>
+                </div>
+            </div>
+
+            <div class="window-preview">
+                <div class="window-icon">🖥️</div>
+                <h3>Open Simulated Platform</h3>
+                <p>Click below to open the mock login page in a new window</p>
+                <button class="launch-window-btn" onclick="launchSimulation()">
+                    🚀 Open Simulated Login Page
+                </button>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Tip:</strong> The simulated environment mimics the real HPE GreenLake interface but runs entirely in your browser. Perfect for practice without requiring actual system access!
+            </div>
+
+            <div class="navigation">
+                <a href="#" class="nav-btn btn-back" onclick="alert('This is the first exercise!'); return false;">← Back</a>
+                <a href="lab2.html" class="nav-btn btn-next">Next: Dashboard Navigation →</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function launchSimulation() {
+            // Open the mock login page
+            const mockWindow = window.open('mock-platform/login.html', 'SimulatedLab', 'width=1200,height=800');
+            
+            if (!mockWindow) {
+                alert('Please allow pop-ups for this site to open the simulated environment!');
+            } else {
+                // Store session info
+                localStorage.setItem('labSession', 'simulated');
+                localStorage.setItem('labStartTime', new Date().toISOString());
+            }
+        }
+
+        // Check if returning from simulation
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'mockLoginComplete' && e.newValue === 'true') {
+                alert('✅ Login Successful! You can now proceed to Exercise 2.');
+            }
+        });
+    </script>
+</body>
+</html>

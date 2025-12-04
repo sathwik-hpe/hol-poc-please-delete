@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 4: Create System Backup - Simulated Lab</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💾 Exercise 4: Create System Backup</h1>
+            <div class="badge">🧪 SIMULATED ENVIRONMENT</div>
+        </div>
+
+        <div class="content">
+            <div class="intro-box">
+                <h2>🎯 Objective</h2>
+                <p>Learn how to configure S3-compatible storage and create system backups in the simulated HPE SilverCreek environment.</p>
+            </div>
+
+            <div class="credentials-box">
+                <h3>🔑 Mock BSL (Backup Storage Location) Configuration</h3>
+                <p style="margin-bottom: 15px;">Use these dummy values when configuring the backup storage:</p>
+                <div class="config-box">
+                    <div class="config-item">
+                        <span class="config-label">Endpoint URL:</span>
+                        <span class="config-value">https://mock-minio.local:9000</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Access Key:</span>
+                        <span class="config-value">demo_access_key</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Secret Key:</span>
+                        <span class="config-value">demo_secret_key</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Bucket Name:</span>
+                        <span class="config-value">simulated-backups</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Region:</span>
+                        <span class="config-value">us-east-1</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>📋 Steps to Complete:</h3>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-number">1</div>
+                    <div>Click the button below to open the simulated Backup page</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">2</div>
+                    <div>Click "Configure Backup Storage Location" (if not already configured)</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">3</div>
+                    <div>Enter the mock BSL configuration values shown above</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">4</div>
+                    <div>Click "Validate" to test the connection (auto-succeeds)</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">5</div>
+                    <div>Click "Create Backup" to start the simulated backup process</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">6</div>
+                    <div>Watch the progress bar (completes in ~10 seconds)</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">7</div>
+                    <div>View the backup summary with fake size and timestamp</div>
+                </div>
+            </div>
+
+            <div class="window-preview">
+                <div class="window-icon">💾</div>
+                <h3>Open Backup Configuration</h3>
+                <p>This will navigate to the mock backup management page</p>
+                <button class="launch-window-btn" onclick="navigateToBackups()">
+                    🚀 Go to Backups
+                </button>
+            </div>
+
+            <div class="warning-box">
+                <strong>⏱️ Note:</strong> In the real system, backup creation takes 10-30 minutes depending on data size. This simulation completes instantly!
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Best Practices:</strong>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>Schedule regular automated backups</li>
+                    <li>Verify backup integrity periodically</li>
+                    <li>Store backups in geographically separate locations</li>
+                    <li>Test restore procedures regularly</li>
+                </ul>
+            </div>
+
+            <div class="navigation">
+                <a href="lab3.html" class="nav-btn btn-back">← Back: Support Bundle</a>
+                <a href="#" class="nav-btn btn-next" onclick="completeLabExercises(); return false;">🎉 Complete Lab!</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigateToBackups() {
+            const mockWindow = window.open('mock-platform/backup.html', 'SimulatedLab', 'width=1200,height=800');
+            
+            if (!mockWindow) {
+                alert('Please allow pop-ups for this site!');
+            }
+        }
+
+        function completeLabExercises() {
+            alert('🎉 Congratulations! You have completed all 4 simulated lab exercises!\n\n' +
+                  '✅ Exercise 1: Login & Workspace Selection\n' +
+                  '✅ Exercise 2: Dashboard Navigation\n' +
+                  '✅ Exercise 3: Generate Support Bundle\n' +
+                  '✅ Exercise 4: Create System Backup\n\n' +
+                  'You are now ready to work with the real HPE SilverCreek system!');
+        }
+    </script>
+</body>
+</html>

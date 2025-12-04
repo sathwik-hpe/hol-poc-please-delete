@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HPE SilverCreek</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="mock-platform">
+    <div class="mock-header">
+        <div class="mock-logo">🌿 HPE SilverCreek</div>
+        <div class="mock-user">
+            <span>🏢 HPE CSP Operations</span>
+            <span style="margin: 0 10px;">|</span>
+            <span id="username">admin@silvercreek.local</span>
+            <span style="cursor: pointer;" onclick="logout()">🚪</span>
+        </div>
+    </div>
+
+    <div class="mock-grid">
+        <div class="mock-sidebar">
+            <div class="mock-menu-item active" onclick="showPage('dashboard')">
+                📊 Dashboard
+            </div>
+            <div class="mock-menu-item" onclick="showPage('vms')">
+                🖥️ Virtual Machines
+            </div>
+            <div class="mock-menu-item" onclick="showPage('storage')">
+                💾 Storage
+            </div>
+            <div class="mock-menu-item" onclick="showPage('network')">
+                🌐 Network
+            </div>
+            <div class="mock-menu-item" onclick="alert('Navigate to System menu')">
+                ⚙️ System
+            </div>
+            <div style="margin-left: 20px;">
+                <div class="mock-menu-item" onclick="window.location.href='support-logs.html'">
+                    📋 Support Logs
+                </div>
+                <div class="mock-menu-item" onclick="window.location.href='backup.html'">
+                    💾 Backup
+                </div>
+                <div class="mock-menu-item" onclick="alert('Mock Monitoring page')">
+                    📈 Monitoring
+                </div>
+            </div>
+        </div>
+
+        <div class="mock-content">
+            <div id="pageContent">
+                <h1>📊 Dashboard Overview</h1>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
+                    <div class="mock-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <h3 style="color: white;">Virtual Machines</h3>
+                        <div style="font-size: 3em; font-weight: bold;">12</div>
+                        <div class="status-badge" style="background: rgba(255,255,255,0.3); color: white;">8 Running</div>
+                    </div>
+
+                    <div class="mock-card" style="background: linear-gradient(135deg, #01a982 0%, #00c896 100%); color: white;">
+                        <h3 style="color: white;">CPU Usage</h3>
+                        <div style="font-size: 3em; font-weight: bold;">42%</div>
+                        <div class="status-badge" style="background: rgba(255,255,255,0.3); color: white;">Normal</div>
+                    </div>
+
+                    <div class="mock-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                        <h3 style="color: white;">Memory</h3>
+                        <div style="font-size: 3em; font-weight: bold;">68%</div>
+                        <div class="status-badge" style="background: rgba(255,255,255,0.3); color: white;">256GB Total</div>
+                    </div>
+
+                    <div class="mock-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                        <h3 style="color: white;">Storage</h3>
+                        <div style="font-size: 3em; font-weight: bold;">5.2TB</div>
+                        <div class="status-badge" style="background: rgba(255,255,255,0.3); color: white;">8TB Total</div>
+                    </div>
+                </div>
+
+                <div class="mock-card">
+                    <h2>🖥️ Recent Virtual Machines</h2>
+                    <table class="mock-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>CPU</th>
+                                <th>Memory</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>web-server-01</td>
+                                <td><span class="status-badge status-success">Running</span></td>
+                                <td>4 cores</td>
+                                <td>16 GB</td>
+                                <td>10.0.1.101</td>
+                            </tr>
+                            <tr>
+                                <td>db-server-01</td>
+                                <td><span class="status-badge status-success">Running</span></td>
+                                <td>8 cores</td>
+                                <td>32 GB</td>
+                                <td>10.0.1.102</td>
+                            </tr>
+                            <tr>
+                                <td>app-server-01</td>
+                                <td><span class="status-badge status-warning">Stopped</span></td>
+                                <td>4 cores</td>
+                                <td>16 GB</td>
+                                <td>10.0.1.103</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mock-card">
+                    <h2>📊 System Health</h2>
+                    <div style="margin: 20px 0;">
+                        <strong>CPU Load:</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 42%;">42%</div>
+                        </div>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <strong>Memory Usage:</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 68%;">68%</div>
+                        </div>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <strong>Storage Usage:</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%;">65%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        if (localStorage.getItem('mockLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to log out?')) {
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+
+        function showPage(page) {
+            // Remove active class from all menu items
+            document.querySelectorAll('.mock-menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            event.target.classList.add('active');
+            
+            // Update content
+            const content = document.getElementById('pageContent');
+            
+            switch(page) {
+                case 'dashboard':
+                    content.innerHTML = '<h1>📊 Dashboard</h1><p>This is the main dashboard view (already shown above).</p>';
+                    break;
+                case 'vms':
+                    content.innerHTML = '<h1>🖥️ Virtual Machines</h1><div class="mock-card"><p>List of all virtual machines in the system...</p></div>';
+                    break;
+                case 'storage':
+                    content.innerHTML = '<h1>💾 Storage</h1><div class="mock-card"><p>Storage volumes and capacity management...</p></div>';
+                    break;
+                case 'network':
+                    content.innerHTML = '<h1>🌐 Network</h1><div class="mock-card"><p>Network configuration and topology...</p></div>';
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

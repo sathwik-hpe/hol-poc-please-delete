@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 3: Generate Support Bundle - Simulated Lab</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Exercise 3: Generate Support Bundle</h1>
+            <div class="badge">🧪 SIMULATED ENVIRONMENT</div>
+        </div>
+
+        <div class="content">
+            <div class="intro-box">
+                <h2>🎯 Objective</h2>
+                <p>Learn how to generate a support bundle in the simulated HPE SilverCreek environment. The bundle generation will be simulated with a progress bar.</p>
+            </div>
+
+            <h3>📖 What is a Support Bundle?</h3>
+            <p style="margin: 15px 0;">A support bundle contains system logs, configuration files, and diagnostic information that helps HPE support troubleshoot issues.</p>
+
+            <h3>📋 Steps to Complete:</h3>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-number">1</div>
+                    <div>Click the button below to open the simulated Support Logs page</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">2</div>
+                    <div>Click on "Generate Support Bundle" button</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">3</div>
+                    <div>Watch the simulated progress bar (takes ~5 seconds)</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">4</div>
+                    <div>Once complete, you'll see a mock download link</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">5</div>
+                    <div>View the bundle contents summary (fake data)</div>
+                </div>
+            </div>
+
+            <div class="window-preview">
+                <div class="window-icon">📦</div>
+                <h3>Open Support Bundle Generator</h3>
+                <p>This will navigate to the mock support logs page</p>
+                <button class="launch-window-btn" onclick="navigateToSupportLogs()">
+                    🚀 Go to Support Logs
+                </button>
+            </div>
+
+            <div class="warning-box">
+                <strong>⏱️ Note:</strong> In the real system, bundle generation takes 10-15 minutes. In this simulation, it completes in seconds!
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Real-World Usage:</strong> Support bundles are typically generated when experiencing issues and need to share diagnostic data with HPE support teams.
+            </div>
+
+            <div class="navigation">
+                <a href="lab2.html" class="nav-btn btn-back">← Back: Dashboard</a>
+                <a href="lab4.html" class="nav-btn btn-next">Next: System Backup →</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigateToSupportLogs() {
+            const mockWindow = window.open('mock-platform/support-logs.html', 'SimulatedLab', 'width=1200,height=800');
+            
+            if (!mockWindow) {
+                alert('Please allow pop-ups for this site!');
+            }
+        }
+    </script>
+</body>
+</html>

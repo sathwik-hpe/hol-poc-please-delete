@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2: Dashboard Navigation - Simulated Lab</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Exercise 2: Dashboard Navigation</h1>
+            <div class="badge">🧪 SIMULATED ENVIRONMENT</div>
+        </div>
+
+        <div class="content">
+            <div class="intro-box">
+                <h2>🎯 Objective</h2>
+                <p>Explore the simulated HPE SilverCreek dashboard and familiarize yourself with its key features and navigation structure.</p>
+            </div>
+
+            <h3>📋 Tasks to Complete:</h3>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-number">1</div>
+                    <div><strong>Home Page:</strong> Click the button below to open the simulated dashboard</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">2</div>
+                    <div><strong>Virtual Machines:</strong> View the list of VMs in the mock dashboard</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">3</div>
+                    <div><strong>Storage:</strong> Check the storage capacity and usage (fake data)</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">4</div>
+                    <div><strong>System Menu:</strong> Explore the System menu in the left sidebar</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">5</div>
+                    <div><strong>Alerts:</strong> Look for any dummy alert notifications</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">6</div>
+                    <div><strong>User Menu:</strong> Click on the user icon to see profile options</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-number">7</div>
+                    <div><strong>Search:</strong> Try the search functionality (mock results)</div>
+                </div>
+            </div>
+
+            <div class="window-preview">
+                <div class="window-icon">🖥️</div>
+                <h3>Open Simulated Dashboard</h3>
+                <p>This will open or reuse your simulation window</p>
+                <button class="launch-window-btn" onclick="navigateToDashboard()">
+                    🚀 Open Dashboard
+                </button>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Navigation Tips:</strong>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>All menu items are clickable and show mock content</li>
+                    <li>Data is randomly generated for demonstration</li>
+                    <li>Feel free to explore all sections without worries!</li>
+                </ul>
+            </div>
+
+            <div class="navigation">
+                <a href="index.html" class="nav-btn btn-back">← Back: Login</a>
+                <a href="lab3.html" class="nav-btn btn-next">Next: Support Bundle →</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigateToDashboard() {
+            const mockWindow = window.open('mock-platform/dashboard.html', 'SimulatedLab', 'width=1200,height=800');
+            
+            if (!mockWindow) {
+                alert('Please allow pop-ups for this site!');
+            }
+        }
+    </script>
+</body>
+</html>

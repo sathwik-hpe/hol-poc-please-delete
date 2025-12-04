@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPE SilverCreek - Login</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="login-container">
+    <div class="login-box">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #01a982; font-size: 2em;">🌿 HPE SilverCreek</h2>
+            <p style="color: #6c757d; font-size: 0.9em;">Simulated Environment</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" class="mock-input" placeholder="admin@silvercreek.local" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="mock-input" placeholder="Demo@123" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="mock-button" style="width: 100%; padding: 15px; font-size: 1.1em;">
+                    🔐 Sign In
+                </button>
+            </div>
+
+            <div class="tip-box" style="margin-top: 20px;">
+                <strong>💡 Demo Credentials:</strong><br>
+                Username: admin@silvercreek.local<br>
+                Password: Demo@123
+            </div>
+        </form>
+
+        <div id="loginMessage" style="margin-top: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            // Simulate authentication
+            if (username === 'admin@silvercreek.local' && password === 'Demo@123') {
+                messageDiv.style.display = 'block';
+                messageDiv.style.background = '#d4edda';
+                messageDiv.style.color = '#155724';
+                messageDiv.innerHTML = '✅ Login successful! Redirecting to workspace selection...';
+                
+                // Store login state
+                localStorage.setItem('mockLoggedIn', 'true');
+                localStorage.setItem('mockUsername', username);
+                
+                // Redirect to workspace selection
+                setTimeout(() => {
+                    window.location.href = 'workspace-selection.html';
+                }, 1500);
+            } else {
+                messageDiv.style.display = 'block';
+                messageDiv.style.background = '#f8d7da';
+                messageDiv.style.color = '#721c24';
+                messageDiv.innerHTML = '❌ Invalid credentials. Please use the demo credentials provided.';
+            }
+        }
+
+        // Check if already logged in
+        window.onload = function() {
+            if (localStorage.getItem('mockLoggedIn') === 'true') {
+                window.location.href = 'workspace-selection.html';
+            }
+        };
+    </script>
+</body>
+</html>

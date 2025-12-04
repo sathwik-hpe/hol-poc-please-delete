@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Workspace - HPE SilverCreek</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="login-container">
+    <div class="login-box" style="max-width: 700px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #01a982;">🏢 Select Workspace</h2>
+            <p style="color: #6c757d;">Welcome, <strong id="username"></strong></p>
+        </div>
+
+        <div class="workspace-grid">
+            <div class="workspace-card" onclick="selectWorkspace('HPE CSP Operations')">
+                <h3 style="color: #01a982; margin-bottom: 10px;">🖥️ HPE CSP Operations</h3>
+                <p style="color: #6c757d; font-size: 0.9em;">Primary operations workspace</p>
+                <div class="status-badge status-success" style="margin-top: 10px;">Active</div>
+            </div>
+
+            <div class="workspace-card" onclick="selectWorkspace('Development')">
+                <h3 style="color: #667eea; margin-bottom: 10px;">🔧 Development</h3>
+                <p style="color: #6c757d; font-size: 0.9em;">Development and testing</p>
+                <div class="status-badge status-info" style="margin-top: 10px;">Available</div>
+            </div>
+
+            <div class="workspace-card" onclick="selectWorkspace('Staging')">
+                <h3 style="color: #ffc107; margin-bottom: 10px;">📦 Staging</h3>
+                <p style="color: #6c757d; font-size: 0.9em;">Pre-production environment</p>
+                <div class="status-badge status-warning" style="margin-top: 10px;">Available</div>
+            </div>
+
+            <div class="workspace-card" style="opacity: 0.6; cursor: not-allowed;" onclick="alert('This workspace is not available in the demo')">
+                <h3 style="color: #6c757d; margin-bottom: 10px;">🔒 Production</h3>
+                <p style="color: #6c757d; font-size: 0.9em;">Production environment</p>
+                <div class="status-badge" style="background: #e9ecef; color: #6c757d; margin-top: 10px;">Restricted</div>
+            </div>
+        </div>
+
+        <div class="tip-box" style="margin-top: 20px;">
+            <strong>💡 For this lab:</strong> Select "HPE CSP Operations" workspace to continue.
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        if (localStorage.getItem('mockLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // Display username
+        document.getElementById('username').textContent = localStorage.getItem('mockUsername') || 'User';
+
+        function selectWorkspace(workspaceName) {
+            if (workspaceName === 'HPE CSP Operations') {
+                localStorage.setItem('mockWorkspace', workspaceName);
+                localStorage.setItem('mockLoginComplete', 'true');
+                
+                // Show success message
+                const body = document.querySelector('.login-box');
+                body.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div class="success-icon">✅</div>
+                        <h2 style="color: #01a982;">Workspace Selected!</h2>
+                        <p style="margin: 20px 0; color: #6c757d;">
+                            You have successfully logged into:<br>
+                            <strong>${workspaceName}</strong>
+                        </p>
+                        <button class="mock-button" onclick="proceedToDashboard()" style="padding: 15px 40px;">
+                            Continue to Dashboard →
+                        </button>
+                    </div>
+                `;
+            } else {
+                alert('For this demo, please select "HPE CSP Operations" workspace.');
+            }
+        }
+
+        function proceedToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>
