@@ -48,8 +48,8 @@ python3 --version
 
 ### 1. Clone this repository
 ```bash
-git clone <your-repo-url>
-cd hol
+git clone git@github.com:sathwik-hpe/hol-poc-please-delete.git
+cd hol-poc-please-delete
 ```
 
 ### 2. Choose your lab environment
