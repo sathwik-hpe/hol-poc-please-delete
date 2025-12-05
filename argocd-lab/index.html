@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitOps with ArgoCD - Hands-On Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; min-height: 100vh; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .breadcrumb { padding: 1rem 2rem; background: rgba(13, 31, 45, 0.6); }
+        .breadcrumb-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #94a3b8; }
+        .breadcrumb a { color: #01a982; text-decoration: none; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .hero { text-align: center; padding: 3rem 2rem; background: rgba(1, 169, 130, 0.05); border-radius: 1rem; margin-bottom: 3rem; }
+        .hero h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #01a982 0%, #00c896 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; color: #cbd5e1; max-width: 800px; margin: 0 auto; }
+        .badge { display: inline-block; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; margin: 1rem 0.25rem 0; }
+        .badge-success { background: rgba(1, 169, 130, 0.2); color: #01a982; border: 1px solid rgba(1, 169, 130, 0.4); }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); }
+        h3 { color: #00c896; font-size: 1.5rem; margin: 1.5rem 0 1rem; }
+        h4 { color: #cbd5e1; font-size: 1.2rem; margin: 1rem 0 0.5rem; }
+        p { margin-bottom: 1rem; color: #cbd5e1; }
+        ul, ol { margin: 1rem 0 1rem 2rem; color: #cbd5e1; }
+        li { margin-bottom: 0.5rem; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; font-size: 0.9em; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); position: relative; }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1.5rem; border-radius: 0.5rem; margin: 1.5rem 0; }
+        .info-box h4 { color: #01a982; margin-top: 0; }
+        .info-box.warning { background: rgba(251, 191, 36, 0.1); border-left-color: #fbbf24; }
+        .info-box.warning h4 { color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#01a982" /><stop offset="100%" style="stop-color:#00c896" />
+                    </linearGradient></defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="../index.html">🏠 Home</a>
+            <span>›</span>
+            <span>GitOps with ArgoCD</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>🔄 GitOps with ArgoCD</h1>
+            <p>Learn modern GitOps workflows with ArgoCD for continuous deployment and declarative Kubernetes management. Deploy applications automatically from Git repositories.</p>
+            <div>
+                <span class="badge badge-success">Production Ready</span>
+                <span class="badge badge-success">Declarative</span>
+                <span class="badge badge-success">GitOps</span>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 What is GitOps?</h2>
+            <p>GitOps is a way of implementing Continuous Deployment for cloud native applications. It uses Git as a single source of truth for declarative infrastructure and applications.</p>
+            
+            <h3>Core Principles</h3>
+            <ul>
+                <li><strong>Declarative:</strong> System described declaratively in Git</li>
+                <li><strong>Versioned & Immutable:</strong> Git history provides version control and audit trail</li>
+                <li><strong>Pulled Automatically:</strong> Software agents automatically pull desired state from Git</li>
+                <li><strong>Continuously Reconciled:</strong> Software agents ensure actual state matches desired state</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>📦 Installing ArgoCD</h2>
+            
+            <h3>Step 1: Install ArgoCD</h3>
+            <pre><code># Create namespace
+kubectl create namespace argocd
+
+# Install ArgoCD
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# Wait for pods to be ready
+kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
+
+# Verify installation
+kubectl get pods -n argocd</code></pre>
+
+            <h3>Step 2: Access ArgoCD UI</h3>
+            <pre><code># Get initial admin password
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+# Port forward to access UI
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+# Or expose with LoadBalancer/NodePort
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+# Access: https://localhost:8080
+# Username: admin
+# Password: (from above command)</code></pre>
+
+            <h3>Step 3: Install ArgoCD CLI</h3>
+            <pre><code># macOS
+brew install argocd
+
+# Linux
+curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x /usr/local/bin/argocd
+
+# Login via CLI
+argocd login localhost:8080
+
+# Change password
+argocd account update-password</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🚀 Deploying Your First Application</h2>
+            
+            <h3>Method 1: Using ArgoCD UI</h3>
+            <ol>
+                <li>Click <strong>+ NEW APP</strong></li>
+                <li>Fill in details:
+                    <ul>
+                        <li>Application Name: guestbook</li>
+                        <li>Project: default</li>
+                        <li>Sync Policy: Manual/Automatic</li>
+                        <li>Repository URL: https://github.com/argoproj/argocd-example-apps.git</li>
+                        <li>Path: guestbook</li>
+                        <li>Cluster: https://kubernetes.default.svc</li>
+                        <li>Namespace: default</li>
+                    </ul>
+                </li>
+                <li>Click <strong>CREATE</strong></li>
+                <li>Click <strong>SYNC</strong> to deploy</li>
+            </ol>
+
+            <h3>Method 2: Using ArgoCD CLI</h3>
+            <pre><code>argocd app create guestbook \
+  --repo https://github.com/argoproj/argocd-example-apps.git \
+  --path guestbook \
+  --dest-server https://kubernetes.default.svc \
+  --dest-namespace default
+
+# Sync application
+argocd app sync guestbook
+
+# Check status
+argocd app get guestbook
+
+# List applications
+argocd app list</code></pre>
+
+            <h3>Method 3: Declarative (GitOps Way)</h3>
+            <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: guestbook
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD
+    path: guestbook
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+
+# Apply
+kubectl apply -f application.yaml</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔧 ArgoCD Application Patterns</h2>
+            
+            <h3>Helm Application</h3>
+            <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-helm
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: nginx
+    targetRevision: 13.2.23
+    helm:
+      values: |
+        replicaCount: 3
+        service:
+          type: LoadBalancer
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nginx
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true</code></pre>
+
+            <h3>Kustomize Application</h3>
+            <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-kustomize
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/myorg/myapp.git
+    targetRevision: HEAD
+    path: overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated: {}</code></pre>
+
+            <h3>Multi-Source Application</h3>
+            <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: multi-source-app
+spec:
+  sources:
+  - repoURL: https://github.com/org/app.git
+    path: manifests
+    targetRevision: main
+  - repoURL: https://github.com/org/config.git
+    path: values
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: app</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔄 Sync Strategies</h2>
+            
+            <h3>Manual Sync</h3>
+            <pre><code>syncPolicy:
+  syncOptions:
+  - CreateNamespace=true
+# User triggers sync manually via UI/CLI</code></pre>
+
+            <h3>Automatic Sync</h3>
+            <pre><code>syncPolicy:
+  automated:
+    prune: true      # Delete resources not in Git
+    selfHeal: true   # Revert manual changes
+    allowEmpty: false</code></pre>
+
+            <h3>Sync Hooks</h3>
+            <pre><code>apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: migrate-tool:latest
+        command: ["migrate", "up"]
+      restartPolicy: Never
+
+# Hook types:
+# - PreSync: Before sync
+# - Sync: During sync
+# - PostSync: After sync
+# - SyncFail: On sync failure
+# - Skip: Skip resource in sync</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🌍 Multi-Environment Deployments</h2>
+            
+            <h3>App of Apps Pattern</h3>
+            <pre><code># parent-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/org/apps.git
+    path: apps
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated: {}
+
+# apps/dev.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-dev
+spec:
+  source:
+    repoURL: https://github.com/org/myapp.git
+    path: overlays/dev
+  destination:
+    namespace: dev
+
+# apps/prod.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-prod
+spec:
+  source:
+    repoURL: https://github.com/org/myapp.git
+    path: overlays/prod
+  destination:
+    namespace: prod</code></pre>
+
+            <h3>ApplicationSet for Multiple Clusters</h3>
+            <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: myapp-multi-cluster
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: dev-cluster
+        url: https://dev.k8s.example.com
+      - cluster: prod-cluster
+        url: https://prod.k8s.example.com
+  template:
+    metadata:
+      name: '{{cluster}}-myapp'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/org/myapp.git
+        path: manifests
+      destination:
+        server: '{{url}}'
+        namespace: myapp</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ ArgoCD Commands Cheatsheet</h2>
+            
+            <pre><code># Application management
+argocd app create APP_NAME
+argocd app list
+argocd app get APP_NAME
+argocd app sync APP_NAME
+argocd app delete APP_NAME
+argocd app set APP_NAME --parameter key=value
+
+# View resources
+argocd app resources APP_NAME
+argocd app manifests APP_NAME
+argocd app diff APP_NAME
+
+# History and rollback
+argocd app history APP_NAME
+argocd app rollback APP_NAME REVISION
+
+# Repository management
+argocd repo add REPO_URL
+argocd repo list
+
+# Cluster management
+argocd cluster add CONTEXT_NAME
+argocd cluster list
+
+# Project management
+argocd proj create PROJECT_NAME
+argocd proj list
+
+# Account management
+argocd account list
+argocd account update-password</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Best Practices</h2>
+            <ul>
+                <li>✅ Use separate repos for app code and manifests</li>
+                <li>✅ Enable automatic sync with selfHeal for production</li>
+                <li>✅ Use sync waves for ordered deployment</li>
+                <li>✅ Implement RBAC for multi-tenancy</li>
+                <li>✅ Use ApplicationSets for multi-cluster deployments</li>
+                <li>✅ Monitor ArgoCD metrics with Prometheus</li>
+                <li>✅ Back up ArgoCD configuration regularly</li>
+                <li>✅ Use Projects to isolate teams and environments</li>
+                <li>✅ Leverage hooks for pre/post sync tasks</li>
+                <li>✅ Test sync policies in dev before production</li>
+            </ul>
+
+            <div class="info-box">
+                <h4>💡 Pro Tip</h4>
+                <p>ArgoCD's "App of Apps" pattern is perfect for managing multiple environments and microservices. It allows you to manage all your applications declaratively from a single Git repository.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

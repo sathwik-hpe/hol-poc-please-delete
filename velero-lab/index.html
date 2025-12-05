@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0d1f2d;
+            background: #0f172a;
             color: #e2e8f0;
             line-height: 1.6;
             overflow-x: hidden;
@@ -22,9 +22,9 @@
 
         /* Navigation Bar */
         .navbar {
-            background: rgba(13, 31, 45, 0.98);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(1, 169, 130, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1rem 0;
             position: fixed;
             width: 100%;
@@ -46,15 +46,10 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: 700;
             color: #01a982;
             text-decoration: none;
-        }
-
-        .nav-logo svg {
-            width: 40px;
-            height: 40px;
         }
 
         .nav-logo span {
@@ -455,18 +450,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="nav-logo">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
-                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d" opacity="0.7"/>
-                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <defs>
-                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#01a982;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#00c896;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <span>HPE Labs Hub</span>
+                <span>🚀</span>
+                <span>Cloud Labs Hub</span>
             </a>
             <ul class="nav-menu">
                 <li><a href="#labs">Hands-On Labs</a></li>
@@ -509,33 +494,32 @@
             </div>
 
             <div class="cards-grid">
-                <!-- Private Cloud Labs -->
                 <div class="card featured-card">
                     <span class="card-icon">☁️</span>
-                    <h3>HPE Private Cloud Labs</h3>
-                    <p>Comprehensive interactive labs for HPE GreenLake Private Cloud. Choose between real infrastructure or simulated environments.</p>
+                    <h3>Private Cloud Hands-On Lab</h3>
+                    <p>Comprehensive interactive lab for HPE GreenLake Private Cloud (Silvercreek). Learn deployment, management, and operations with hands-on exercises.</p>
                     
                     <div class="card-badges">
-                        <span class="badge badge-blue">Multiple Labs</span>
-                        <span class="badge badge-green">Real & Simulated</span>
+                        <span class="badge badge-blue">Interactive</span>
+                        <span class="badge badge-green">Production-Ready</span>
                         <span class="badge badge-pink">Enterprise</span>
                     </div>
 
                     <ul class="card-features">
-                        <li>Real infrastructure deployment</li>
-                        <li>Simulated learning environment</li>
-                        <li>Advanced operations (coming soon)</li>
-                        <li>Multi-cloud integration (coming soon)</li>
+                        <li>HPE GreenLake Private Cloud setup</li>
+                        <li>Infrastructure deployment & configuration</li>
+                        <li>Management and monitoring</li>
+                        <li>Embedded terminal for real practice</li>
+                        <li>Step-by-step guided exercises</li>
                     </ul>
 
-                    <a href="private-cloud/index.html" class="btn">Explore Private Cloud Labs →</a>
+                    <a href="../private-cloud/index.html" class="btn">Start Private Cloud Lab →</a>
                 </div>
 
-                <!-- Velero Backup & Restore -->
                 <div class="card featured-card">
                     <span class="card-icon">🎓</span>
                     <h3>Velero Backup & Restore Lab</h3>
-                    <p>Complete interactive lab with embedded terminal for Kubernetes backup and disaster recovery mastery.</p>
+                    <p>Complete interactive lab with embedded terminal, real-time practice, and step-by-step guidance through Kubernetes backup and disaster recovery.</p>
                     
                     <div class="card-badges">
                         <span class="badge badge-blue">Interactive</span>
@@ -544,140 +528,14 @@
                     </div>
 
                     <ul class="card-features">
-                        <li>Install Velero with Helm</li>
-                        <li>Create and manage backups</li>
-                        <li>Disaster recovery simulation</li>
-                        <li>Production-ready workflows</li>
+                        <li>Exercise 1: Install Velero with Helm</li>
+                        <li>Exercise 2: Create your first backup</li>
+                        <li>Exercise 3: Disaster recovery simulation</li>
+                        <li>Embedded terminal for real practice</li>
+                        <li>Copy-paste code examples</li>
                     </ul>
 
-                    <a href="velero-lab/real-lab/index.html" class="btn">Start Velero Lab →</a>
-                </div>
-
-                <!-- Kubernetes Fundamentals -->
-                <div class="card featured-card">
-                    <span class="card-icon">⎈</span>
-                    <h3>Kubernetes Fundamentals</h3>
-                    <p>Master Kubernetes from basics to advanced - Complete CKA exam preparation covering architecture, workloads, networking, storage, security, and troubleshooting.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-blue">CKA Aligned</span>
-                        <span class="badge badge-purple">9 Modules</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>Complete K8s architecture deep dive</li>
-                        <li>Workloads, networking & storage</li>
-                        <li>Security, RBAC & best practices</li>
-                        <li>Scheduling & troubleshooting</li>
-                    </ul>
-
-                    <a href="k8s-fundamentals/index.html" class="btn">Start Learning K8s →</a>
-                </div>
-
-                <!-- GitOps with ArgoCD -->
-                <div class="card">
-                    <span class="card-icon">🔄</span>
-                    <h3>GitOps with ArgoCD</h3>
-                    <p>Learn modern GitOps workflows with ArgoCD for continuous deployment and declarative Kubernetes management.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-pink">Advanced</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>GitOps principles and practices</li>
-                        <li>ArgoCD setup and configuration</li>
-                        <li>Application deployment automation</li>
-                        <li>Multi-environment management</li>
-                    </ul>
-
-                    <a href="argocd-lab/index.html" class="btn">Start ArgoCD Lab →</a>
-                </div>
-
-                <!-- Helm Charts -->
-                <div class="card">
-                    <span class="card-icon">⎈</span>
-                    <h3>Helm Package Manager</h3>
-                    <p>Package, deploy, and manage Kubernetes applications efficiently using Helm charts and best practices.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-blue">Practical</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>Helm fundamentals</li>
-                        <li>Creating custom charts</li>
-                        <li>Chart templating</li>
-                        <li>Repository management</li>
-                    </ul>
-
-                    <a href="helm-lab/index.html" class="btn">Start Helm Lab →</a>
-                </div>
-
-                <!-- Service Mesh with Istio -->
-                <div class="card">
-                    <span class="card-icon">🕸️</span>
-                    <h3>Service Mesh with Istio</h3>
-                    <p>Implement service mesh architecture for microservices with traffic management, security, and observability.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-pink">Advanced</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>Istio architecture overview</li>
-                        <li>Traffic management policies</li>
-                        <li>mTLS and security</li>
-                        <li>Observability and tracing</li>
-                    </ul>
-
-                    <a href="istio-lab/index.html" class="btn">Start Istio Lab →</a>
-                </div>
-
-                <!-- Monitoring with Prometheus -->
-                <div class="card">
-                    <span class="card-icon">📊</span>
-                    <h3>Monitoring with Prometheus & Grafana</h3>
-                    <p>Build comprehensive monitoring solutions with Prometheus metrics and Grafana dashboards.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-green">Essential</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>Prometheus setup and configuration</li>
-                        <li>PromQL query language</li>
-                        <li>Grafana dashboard creation</li>
-                        <li>Alerting and notifications</li>
-                    </ul>
-
-                    <a href="prometheus-lab/index.html" class="btn">Start Prometheus Lab →</a>
-                </div>
-
-                <!-- CI/CD Pipelines -->
-                <div class="card">
-                    <span class="card-icon">🚀</span>
-                    <h3>CI/CD Pipelines</h3>
-                    <p>Design and implement automated CI/CD pipelines for Kubernetes applications using modern tools.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-blue">Practical</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>Pipeline architecture design</li>
-                        <li>GitHub Actions / Jenkins integration</li>
-                        <li>Container image building</li>
-                        <li>Automated testing and deployment</li>
-                    </ul>
-
-                    <a href="cicd-lab/index.html" class="btn">Start CI/CD Lab →</a>
+                    <a href="real-lab/index.html" class="btn">Start Velero Lab →</a>
                 </div>
             </div>
         </section>
@@ -693,61 +551,21 @@
                 <div class="card">
                     <span class="card-icon">📋</span>
                     <h3>Velero vs VMware Snapshots</h3>
-                    <p>Comprehensive technical comparison of backup strategies for Kubernetes, analyzing why traditional VM snapshots fall short for cloud-native workloads.</p>
+                    <p>Comprehensive comparison of backup strategies for Kubernetes environments, analyzing why traditional VM snapshots fall short.</p>
                     
                     <div class="card-badges">
-                        <span class="badge badge-purple">Technical Deep-Dive</span>
+                        <span class="badge badge-purple">Technical</span>
                         <span class="badge badge-pink">Architecture</span>
                     </div>
 
                     <ul class="card-features">
-                        <li>VM snapshot limitations</li>
-                        <li>Kubernetes-native backup approaches</li>
+                        <li>Technical deep-dive analysis</li>
                         <li>Architecture comparisons</li>
-                        <li>Production recommendations</li>
+                        <li>Production considerations</li>
+                        <li>Best practices & recommendations</li>
                     </ul>
 
-                    <a href="viewer.html?doc=whitepaper/velero-kubernetes-backup-whitepaper.md" class="btn btn-secondary">Read White Paper →</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">🏗️</span>
-                    <h3>Cloud-Native Architecture Patterns</h3>
-                    <p>Explore proven architectural patterns for building resilient, scalable cloud-native applications on Kubernetes.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-purple">Coming Soon</span>
-                        <span class="badge badge-blue">Architecture</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>Microservices patterns</li>
-                        <li>Service mesh architecture</li>
-                        <li>Resilience and fault tolerance</li>
-                        <li>Scalability strategies</li>
-                    </ul>
-
-                    <a href="#" class="btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">Coming Soon</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">🔒</span>
-                    <h3>Kubernetes Security Best Practices</h3>
-                    <p>Comprehensive guide to securing Kubernetes clusters, workloads, and CI/CD pipelines in production environments.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-purple">Coming Soon</span>
-                        <span class="badge badge-pink">Security</span>
-                    </div>
-
-                    <ul class="card-features">
-                        <li>Cluster hardening</li>
-                        <li>Pod security standards</li>
-                        <li>Network policies</li>
-                        <li>Supply chain security</li>
-                    </ul>
-
-                    <a href="#" class="btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">Coming Soon</a>
+                    <a href="../whitepaper/velero-kubernetes-backup-whitepaper.md" class="btn btn-secondary">Read Paper →</a>
                 </div>
             </div>
         </section>
@@ -755,169 +573,69 @@
         <!-- Blogs Section -->
         <section id="blogs">
             <div class="section-title">
-                <h2>✍️ Expert Blog Posts & Guides</h2>
-                <p>Practical insights, tutorials, and real-world experiences</p>
+                <h2>✍️ Expert Blog Posts</h2>
+                <p>Practical guides and insights from real-world implementations</p>
             </div>
 
             <div class="cards-grid">
-                <!-- Row 1 -->
                 <div class="card">
                     <span class="card-icon">📝</span>
                     <h3>Velero Hands-On Guide</h3>
-                    <p>Comprehensive tutorial covering Velero installation, configuration, and production backup/restore workflows.</p>
+                    <p>Step-by-step tutorial covering installation, configuration, and real-world backup/restore scenarios with production tips.</p>
                     
                     <div class="card-badges">
                         <span class="badge badge-blue">Tutorial</span>
-                        <span class="badge badge-green">Beginner</span>
+                        <span class="badge badge-green">Practical</span>
                     </div>
 
-                    <a href="viewer.html?doc=blog/velero-hands-on-guide.md" class="btn btn-secondary">Read Guide →</a>
+                    <ul class="card-features">
+                        <li>Installation walkthrough</li>
+                        <li>Configuration best practices</li>
+                        <li>Real-world examples</li>
+                        <li>Troubleshooting tips</li>
+                    </ul>
+
+                    <a href="../blog/velero-hands-on-guide.md" class="btn btn-secondary">Read Guide →</a>
                 </div>
 
                 <div class="card">
                     <span class="card-icon">🏗️</span>
                     <h3>Building Interactive Labs</h3>
-                    <p>Behind-the-scenes look at creating this learning platform with embedded terminals and modern UX.</p>
+                    <p>Learn how we built this interactive lab platform with embedded terminals and real-time Kubernetes practice.</p>
                     
                     <div class="card-badges">
-                        <span class="badge badge-purple">Platform</span>
-                        <span class="badge badge-pink">Meta</span>
+                        <span class="badge badge-purple">Meta</span>
+                        <span class="badge badge-pink">Platform</span>
                     </div>
 
-                    <a href="viewer.html?doc=blog/building-interactive-labs.md" class="btn btn-secondary">Read Post →</a>
+                    <ul class="card-features">
+                        <li>Lab platform architecture</li>
+                        <li>Terminal embedding techniques</li>
+                        <li>User experience design</li>
+                        <li>Open-source tools</li>
+                    </ul>
+
+                    <a href="../blog/building-interactive-labs.md" class="btn btn-secondary">Read Post →</a>
                 </div>
 
                 <div class="card">
                     <span class="card-icon">🔮</span>
-                    <h3>Future of Velero Labs</h3>
-                    <p>Roadmap and vision for expanding hands-on labs with advanced scenarios and features.</p>
+                    <h3>Future of Velero HOL</h3>
+                    <p>Roadmap and vision for expanding the Velero hands-on lab experience with advanced features and scenarios.</p>
                     
                     <div class="card-badges">
                         <span class="badge badge-pink">Roadmap</span>
                         <span class="badge badge-purple">Vision</span>
                     </div>
 
-                    <a href="viewer.html?doc=blog/future-velero-hol-plan.md" class="btn btn-secondary">View Roadmap →</a>
-                </div>
+                    <ul class="card-features">
+                        <li>Planned features</li>
+                        <li>Advanced scenarios</li>
+                        <li>Community feedback</li>
+                        <li>Contribution guidelines</li>
+                    </ul>
 
-                <!-- Row 2 -->
-                <div class="card">
-                    <span class="card-icon">⚓</span>
-                    <h3>Kubernetes Best Practices 2025</h3>
-                    <p>Updated guide to Kubernetes best practices covering security, efficiency, and operational excellence.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-blue">Best Practices</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/kubernetes-best-practices-2025.md" class="btn btn-secondary">Read Guide →</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">🚀</span>
-                    <h3>Zero-Downtime Deployments</h3>
-                    <p>Strategies and techniques for achieving zero-downtime deployments in production Kubernetes clusters.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-pink">Advanced</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/zero-downtime-deployments.md" class="btn btn-secondary">Read Post →</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">💰</span>
-                    <h3>Cost Optimization for Kubernetes</h3>
-                    <p>Practical guide to reducing cloud infrastructure costs while maintaining performance and reliability.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-blue">FinOps</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/cost-optimization-kubernetes.md" class="btn btn-secondary">Read Guide →</a>
-                </div>
-
-                <!-- Row 3 -->
-                <div class="card">
-                    <span class="card-icon">🔒</span>
-                    <h3>Kubernetes Security Hardening</h3>
-                    <p>Deep dive into pod security, network policies, and runtime security for production workloads.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-pink">Security</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/kubernetes-security-hardening.md" class="btn btn-secondary">Read Guide →</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">📊</span>
-                    <h3>Production Monitoring Strategies</h3>
-                    <p>Complete guide to building a production-grade observability stack with Prometheus, Grafana, and Loki.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-blue">Monitoring</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/production-monitoring-strategies.md" class="btn btn-secondary">Read Post →</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">🔄</span>
-                    <h3>GitOps Workflow Patterns</h3>
-                    <p>Real-world GitOps patterns and workflows for teams using ArgoCD and Flux.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-purple">GitOps</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/gitops-workflows.md" class="btn btn-secondary">Read Post →</a>
-                </div>
-
-                <!-- Row 4 -->
-                <div class="card">
-                    <span class="card-icon">🌐</span>
-                    <h3>Service Mesh Comparison</h3>
-                    <p>Comprehensive comparison of Istio, Linkerd, and Consul service meshes.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-pink">Advanced</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/service-mesh-comparison.md" class="btn btn-secondary">Read Post →</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">⎈</span>
-                    <h3>Helm vs Kustomize</h3>
-                    <p>Complete comparison guide to help you choose between Helm and Kustomize.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-blue">Tools</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/helm-vs-kustomize.md" class="btn btn-secondary">Read Guide →</a>
-                </div>
-
-                <div class="card">
-                    <span class="card-icon">🔧</span>
-                    <h3>Kubernetes Troubleshooting Guide</h3>
-                    <p>Systematic approach to debugging and resolving Kubernetes issues from pods to nodes.</p>
-                    
-                    <div class="card-badges">
-                        <span class="badge badge-green">Available Now</span>
-                        <span class="badge badge-pink">Operations</span>
-                    </div>
-
-                    <a href="viewer.html?doc=blog/kubernetes-troubleshooting-guide.md" class="btn btn-secondary">Read Guide →</a>
+                    <a href="../blog/future-velero-hol-plan.md" class="btn btn-secondary">View Roadmap →</a>
                 </div>
             </div>
         </section>
@@ -934,7 +652,7 @@
                     <div class="resource-icon">📚</div>
                     <h4>Documentation</h4>
                     <p>Complete lab documentation and setup guides</p>
-                    <a href="velero-lab/README.md" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9em;">View Docs</a>
+                    <a href="README.md" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9em;">View Docs</a>
                 </div>
 
                 <div class="resource-card">
@@ -948,14 +666,14 @@
                     <div class="resource-icon">🧪</div>
                     <h4>Testing Guide</h4>
                     <p>Comprehensive testing and validation procedures</p>
-                    <a href="velero-lab/TESTING-GUIDE.md" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9em;">Test Guide</a>
+                    <a href="TESTING-GUIDE.md" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9em;">Test Guide</a>
                 </div>
 
                 <div class="resource-card">
                     <div class="resource-icon">💻</div>
                     <h4>Terminal Setup</h4>
                     <p>Configure embedded terminal for the lab</p>
-                    <a href="velero-lab/TERMINAL-SETUP.md" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9em;">Setup Terminal</a>
+                    <a href="TERMINAL-SETUP.md" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9em;">Setup Terminal</a>
                 </div>
 
                 <div class="resource-card">

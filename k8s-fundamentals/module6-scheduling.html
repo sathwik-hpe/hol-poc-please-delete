@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modules 6-9: Quick Reference - CKA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .breadcrumb { padding: 1rem 2rem; background: rgba(13, 31, 45, 0.6); }
+        .breadcrumb-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #94a3b8; }
+        .breadcrumb a { color: #01a982; text-decoration: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .module-header { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 2rem; border-radius: 0.5rem; margin-bottom: 2rem; }
+        .module-header h1 { font-size: 2.5rem; color: #01a982; margin-bottom: 0.5rem; }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 1.8rem; margin-bottom: 1rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); padding-bottom: 0.5rem; }
+        h3 { color: #00c896; font-size: 1.4rem; margin: 1.5rem 0 1rem 0; }
+        p, li { color: #cbd5e1; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1.5rem; border-radius: 0.5rem; margin: 1.5rem 0; }
+        .btn-nav { display: inline-flex; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #01a982, #00c896); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; }
+        .btn-nav.secondary { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(1, 169, 130, 0.3); }
+        .navigation-buttons { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(1, 169, 130, 0.2); }
+        ul { margin: 1rem 0 1rem 2rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#01a982" /><stop offset="100%" style="stop-color:#00c896" />
+                    </linearGradient></defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb"><div class="breadcrumb-content">
+        <a href="../index.html">🏠 Home</a><span>›</span>
+        <a href="index.html">Kubernetes Fundamentals</a><span>›</span>
+        <span>Module 6: Scheduling</span>
+    </div></div>
+
+    <div class="container">
+        <div class="module-header">
+            <h1>Module 6: Scheduling & Resource Management</h1>
+            <p>Control pod placement, resource limits, and cluster efficiency.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>📍 Manual Scheduling</h2>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  nodeName: node01  # Bypass scheduler
+  containers:
+  - name: nginx
+    image: nginx</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🏷️ Labels & Selectors</h2>
+            <pre><code># Add labels
+kubectl label pods nginx tier=frontend env=prod
+
+# Filter by label
+kubectl get pods -l env=prod
+kubectl get pods -l 'env in (prod,dev)'
+kubectl get pods -l env=prod,tier=frontend
+
+# Node selector
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  nodeSelector:
+    disktype: ssd
+  containers:
+  - name: nginx
+    image: nginx</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>⚡ Taints & Tolerations</h2>
+            <pre><code># Taint a node
+kubectl taint nodes node01 key=value:NoSchedule
+kubectl taint nodes node01 key=value:NoExecute
+kubectl taint nodes node01 key=value:PreferNoSchedule
+
+# Remove taint
+kubectl taint nodes node01 key=value:NoSchedule-
+
+# Toleration in pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  tolerations:
+  - key: "key"
+    operator: "Equal"
+    value: "value"
+    effect: "NoSchedule"
+  containers:
+  - name: nginx
+    image: nginx</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🧲 Node Affinity</h2>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: with-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: disktype
+            operator: In
+            values:
+            - ssd
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: another-label
+            operator: In
+            values:
+            - another-value
+  containers:
+  - name: nginx
+    image: nginx</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>💪 Resource Requests & Limits</h2>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+spec:
+  containers:
+  - name: app
+    image: images.my-company.example/app:v4
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+
+# 1 CPU = 1000m (millicores)
+# Memory: Ki, Mi, Gi</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 LimitRange & ResourceQuota</h2>
+            <pre><code># LimitRange (per pod/container limits)
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - default:
+      cpu: 1
+    defaultRequest:
+      cpu: 0.5
+    type: Container
+
+# ResourceQuota (namespace totals)
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: pods-high
+spec:
+  hard:
+    cpu: "1000"
+    memory: 200Gi
+    pods: "10"
+    services: "5"
+    persistentvolumeclaims: "3"
+
+kubectl describe quota
+kubectl describe limits</code></pre>
+        </div>
+
+        <div class="module-header" style="margin-top: 3rem;">
+            <h1>Module 7: Monitoring & Logging</h1>
+            <p>Monitor cluster health and application performance.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 Metrics Server</h2>
+            <pre><code># Install metrics-server
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# Resource usage
+kubectl top nodes
+kubectl top pods
+kubectl top pods --all-namespaces --sort-by=cpu
+kubectl top pods --all-namespaces --sort-by=memory</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🩺 Probes</h2>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: goproxy
+spec:
+  containers:
+  - name: goproxy
+    image: registry.k8s.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    # Liveness: Restart if fails
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 3
+      failureThreshold: 3
+    # Readiness: Remove from service if fails
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    # Startup: For slow starting containers
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      failureThreshold: 30
+      periodSeconds: 10</code></pre>
+
+            <h3>Probe Types</h3>
+            <pre><code># HTTP GET
+httpGet:
+  path: /healthz
+  port: 8080
+
+# TCP Socket
+tcpSocket:
+  port: 8080
+
+# Command execution
+exec:
+  command:
+  - cat
+  - /tmp/healthy</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📝 Logging</h2>
+            <pre><code># View logs
+kubectl logs pod-name
+kubectl logs -f pod-name  # follow
+kubectl logs pod-name -c container-name  # specific container
+kubectl logs --previous pod-name  # previous instance
+kubectl logs pod-name --since=1h
+kubectl logs pod-name --tail=20
+
+# Multiple pods
+kubectl logs -l app=nginx
+kubectl logs -l app=nginx --all-containers=true</code></pre>
+        </div>
+
+        <div class="module-header" style="margin-top: 3rem;">
+            <h1>Module 8: Troubleshooting</h1>
+            <p>Debug and fix common Kubernetes issues.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>🔍 Application Troubleshooting</h2>
+            <pre><code># Check pod status
+kubectl get pods
+kubectl describe pod nginx
+
+# Common statuses:
+# - ImagePullBackOff: Cannot pull image
+# - CrashLoopBackOff: Container keeps crashing
+# - Pending: Cannot be scheduled
+# - Error: Container exited with error
+
+# Check logs
+kubectl logs nginx
+kubectl logs nginx --previous
+
+# Execute commands
+kubectl exec -it nginx -- /bin/sh
+kubectl exec nginx -- env
+kubectl exec nginx -- ps aux
+
+# Check events
+kubectl get events --sort-by='.lastTimestamp'
+kubectl get events --field-selector involvedObject.name=nginx
+
+# Debug with ephemeral container
+kubectl debug nginx -it --image=busybox --target=nginx</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>⚙️ Control Plane Troubleshooting</h2>
+            <pre><code># Check control plane pods
+kubectl get pods -n kube-system
+
+# Check component status
+kubectl get componentstatuses  # deprecated but useful
+
+# On master node:
+systemctl status kube-apiserver
+systemctl status kube-controller-manager
+systemctl status kube-scheduler
+systemctl status etcd
+
+journalctl -u kube-apiserver -f
+
+# Check static pod manifests
+ls /etc/kubernetes/manifests/
+cat /etc/kubernetes/manifests/kube-apiserver.yaml</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🖥️ Worker Node Troubleshooting</h2>
+            <pre><code># Check node status
+kubectl get nodes
+kubectl describe node node01
+
+# On worker node:
+systemctl status kubelet
+systemctl status containerd  # or docker
+journalctl -u kubelet -f
+
+# Check certificates
+openssl x509 -in /var/lib/kubelet/pki/kubelet-client-current.pem -text
+
+# Check disk space
+df -h
+du -sh /var/lib/kubelet/
+du -sh /var/lib/containerd/
+
+# Network issues
+ping 8.8.8.8
+curl -k https://kube-apiserver:6443
+nc -zv kube-apiserver 6443</code></pre>
+        </div>
+
+        <div class="module-header" style="margin-top: 3rem;">
+            <h1>Module 9: Cluster Maintenance</h1>
+            <p>Upgrade, backup, and maintain production clusters.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>⬆️ Cluster Upgrades</h2>
+            <pre><code># Check current version
+kubectl version --short
+kubeadm version
+
+# Check upgrade plan
+kubeadm upgrade plan
+
+# Upgrade control plane (one minor version at a time)
+# 1. Drain control plane node
+kubectl drain controlplane --ignore-daemonsets
+
+# 2. Upgrade kubeadm
+apt-get update
+apt-get install -y kubeadm=1.28.0-00
+
+# 3. Upgrade cluster
+kubeadm upgrade apply v1.28.0
+
+# 4. Upgrade kubelet and kubectl
+apt-get install -y kubelet=1.28.0-00 kubectl=1.28.0-00
+systemctl daemon-reload
+systemctl restart kubelet
+
+# 5. Uncordon node
+kubectl uncordon controlplane
+
+# Upgrade worker nodes
+kubectl drain node01 --ignore-daemonsets --force
+# SSH to node, upgrade packages
+apt-get install -y kubeadm=1.28.0-00 kubelet=1.28.0-00
+systemctl daemon-reload
+systemctl restart kubelet
+# Back on master
+kubectl uncordon node01</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔄 Node Maintenance</h2>
+            <pre><code># Drain node (move pods gracefully)
+kubectl drain node01 --ignore-daemonsets --delete-emptydir-data
+
+# Cordon node (mark unschedulable, don't move pods)
+kubectl cordon node01
+
+# Uncordon node (make schedulable again)
+kubectl uncordon node01</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>💾 etcd Backup & Restore</h2>
+            <pre><code># Backup etcd
+ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  snapshot save /backup/etcd-snapshot.db
+
+# Verify backup
+ETCDCTL_API=3 etcdctl snapshot status /backup/etcd-snapshot.db
+
+# Restore etcd
+ETCDCTL_API=3 etcdctl snapshot restore /backup/etcd-snapshot.db \
+  --data-dir=/var/lib/etcd-restore
+
+# Update etcd manifest to use new data dir
+vi /etc/kubernetes/manifests/etcd.yaml
+# Change: --data-dir=/var/lib/etcd-restore
+
+# Restart kubelet
+systemctl restart kubelet</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Final CKA Tips</h2>
+            <ul>
+                <li>✅ Use <code>kubectl</code> aliases: <code>alias k=kubectl</code></li>
+                <li>✅ Master <code>--dry-run=client -o yaml</code> for quick templates</li>
+                <li>✅ Know <code>kubectl explain</code>: <code>kubectl explain pod.spec</code></li>
+                <li>✅ Use <code>kubectl apply</code> instead of <code>create</code> for updates</li>
+                <li>✅ Practice <code>kubectl exec</code>, <code>logs</code>, <code>describe</code>, <code>get events</code></li>
+                <li>✅ Memorize file locations: <code>/etc/kubernetes/</code>, <code>/var/lib/kubelet/</code></li>
+                <li>✅ Know how to drain/cordon nodes</li>
+                <li>✅ Understand RBAC, ServiceAccounts, SecurityContexts</li>
+                <li>✅ Practice etcd backup/restore</li>
+                <li>✅ Time management: Skip hard questions, come back later</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="module5-security.html" class="btn-nav secondary">← Module 5: Security</a>
+            <a href="index.html" class="btn-nav">Back to Modules</a>
+        </div>
+    </div>
+</body>
+</html>

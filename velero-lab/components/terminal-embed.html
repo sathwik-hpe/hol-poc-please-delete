@@ -1,0 +1,188 @@
+<!-- 
+    Embedded Terminal Component
+    
+    Add this to any lab page to embed an interactive terminal.
+    Requires a terminal server running on port 7681 (ttyd or custom server).
+    
+    Usage:
+    1. Include this HTML in your terminal-panel section
+    2. Include the JavaScript at the bottom of your page
+-->
+
+<div class="terminal-embed-container">
+    <!-- Connection Status -->
+    <div id="terminal-status" class="terminal-status">
+        <span class="status-indicator" id="status-indicator">●</span>
+        <span id="status-text">Checking terminal server...</span>
+        <button id="reconnect-btn" class="reconnect-btn" style="display: none;" onclick="reconnectTerminal()">Reconnect</button>
+    </div>
+    
+    <!-- Embedded Terminal iframe -->
+    <iframe 
+        id="terminal-frame"
+        src="http://localhost:7681"
+        style="width: 100%; height: calc(100vh - 150px); border: none; background: #1e1e1e; display: none;"
+        title="Interactive Terminal"
+        allow="clipboard-read; clipboard-write">
+    </iframe>
+    
+    <!-- Fallback Instructions (shown if terminal server not available) -->
+    <div id="terminal-fallback" style="display: none;">
+        <div class="terminal-instructions">
+            <h3>⚠️ Interactive Terminal Not Available</h3>
+            <p>The embedded terminal requires a terminal server to be running.</p>
+            
+            <h4 style="margin-top: 15px;">Quick Setup (Recommended):</h4>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre># Install ttyd
+brew install ttyd
+
+# Start terminal server
+ttyd -p 7681 -W zsh</pre>
+            </div>
+            
+            <p style="margin-top: 15px;">Then refresh this page.</p>
+            
+            <h4 style="margin-top: 15px;">Alternative: Use Your Own Terminal</h4>
+            <p>You can run all commands in your local terminal application (Terminal.app, iTerm2, etc.).</p>
+            
+            <div class="info-box info">
+                <p><strong>💡 Tip:</strong> The embedded terminal is optional. All commands in this lab can be executed in any terminal application on your system.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.terminal-embed-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.terminal-status {
+    background: #2d3748;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9em;
+}
+
+.status-indicator {
+    font-size: 1.5em;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.connected {
+    color: #48bb78;
+    animation: none;
+}
+
+.status-indicator.disconnected {
+    color: #f56565;
+    animation: none;
+}
+
+.status-indicator.connecting {
+    color: #ed8936;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.reconnect-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: auto;
+}
+
+.reconnect-btn:hover {
+    background: #5568d3;
+}
+
+#terminal-fallback {
+    flex: 1;
+    overflow-y: auto;
+}
+</style>
+
+<script>
+let terminalCheckInterval;
+let terminalAvailable = false;
+
+// Check if terminal server is running
+async function checkTerminalServer() {
+    const indicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
+    const frame = document.getElementById('terminal-frame');
+    const fallback = document.getElementById('terminal-fallback');
+    const reconnectBtn = document.getElementById('reconnect-btn');
+    
+    try {
+        const response = await fetch('http://localhost:7681', {
+            method: 'HEAD',
+            mode: 'no-cors'
+        });
+        
+        // If we get here, terminal server is available
+        terminalAvailable = true;
+        indicator.className = 'status-indicator connected';
+        statusText.textContent = 'Connected to terminal server';
+        frame.style.display = 'block';
+        fallback.style.display = 'none';
+        reconnectBtn.style.display = 'none';
+        
+        // Stop checking
+        if (terminalCheckInterval) {
+            clearInterval(terminalCheckInterval);
+        }
+        
+    } catch (error) {
+        // Terminal server not available
+        terminalAvailable = false;
+        indicator.className = 'status-indicator disconnected';
+        statusText.textContent = 'Terminal server not running';
+        frame.style.display = 'none';
+        fallback.style.display = 'block';
+        reconnectBtn.style.display = 'block';
+    }
+}
+
+function reconnectTerminal() {
+    const indicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
+    
+    indicator.className = 'status-indicator connecting';
+    statusText.textContent = 'Connecting...';
+    
+    setTimeout(checkTerminalServer, 1000);
+}
+
+// Check on page load
+checkTerminalServer();
+
+// Check every 5 seconds for first minute
+terminalCheckInterval = setInterval(checkTerminalServer, 5000);
+setTimeout(() => {
+    if (terminalCheckInterval) {
+        clearInterval(terminalCheckInterval);
+    }
+}, 60000);
+
+// Handle iframe load
+document.getElementById('terminal-frame').addEventListener('load', function() {
+    console.log('Terminal frame loaded');
+});
+</script>

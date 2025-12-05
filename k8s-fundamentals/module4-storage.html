@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 4: Storage - CKA Prep</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .breadcrumb { padding: 1rem 2rem; background: rgba(13, 31, 45, 0.6); border-bottom: 1px solid rgba(1, 169, 130, 0.1); }
+        .breadcrumb-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #94a3b8; }
+        .breadcrumb a { color: #01a982; text-decoration: none; transition: color 0.2s; }
+        .breadcrumb a:hover { color: #00c896; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .module-header { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 2rem; border-radius: 0.5rem; margin-bottom: 2rem; }
+        .module-header h1 { font-size: 2.5rem; color: #01a982; margin-bottom: 0.5rem; }
+        .module-header p { font-size: 1.1rem; color: #cbd5e1; }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 1.8rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); }
+        h3 { color: #00c896; font-size: 1.4rem; margin: 1.5rem 0 1rem 0; }
+        p { margin-bottom: 1rem; color: #cbd5e1; }
+        ul, ol { margin: 1rem 0 1rem 2rem; color: #cbd5e1; }
+        li { margin-bottom: 0.5rem; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; font-size: 0.9em; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1.5rem; border-radius: 0.5rem; margin: 1.5rem 0; }
+        .info-box h4 { color: #01a982; margin-top: 0; }
+        .btn-nav { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #01a982 0%, #00c896 100%); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s; margin: 0.5rem; }
+        .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(1, 169, 130, 0.3); }
+        .btn-nav.secondary { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(1, 169, 130, 0.3); }
+        .navigation-buttons { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(1, 169, 130, 0.2); }
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(30, 41, 59, 0.3); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid rgba(1, 169, 130, 0.1); }
+        th { background: rgba(1, 169, 130, 0.1); color: #01a982; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#01a982;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00c896;stop-opacity:1" />
+                    </linearGradient></defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="../index.html">🏠 Home</a>
+            <span>›</span>
+            <a href="index.html">Kubernetes Fundamentals</a>
+            <span>›</span>
+            <span>Module 4: Storage</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="module-header">
+            <h1>Module 4: Storage & Persistence</h1>
+            <p>Volumes, Persistent Volumes, Storage Classes, ConfigMaps, and Secrets.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>💾 Volume Types</h2>
+            
+            <h3>emptyDir (Temporary)</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir: {}</code></pre>
+
+            <h3>hostPath (Node Storage)</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    volumeMounts:
+    - mountPath: /host-data
+      name: host-volume
+  volumes:
+  - name: host-volume
+    hostPath:
+      path: /data
+      type: Directory</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📦 PersistentVolumes & Claims</h2>
+            
+            <h3>PersistentVolume (PV)</h3>
+            <pre><code>apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-1
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data</code></pre>
+
+            <h3>PersistentVolumeClaim (PVC)</h3>
+            <pre><code>apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-1
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: manual</code></pre>
+
+            <h3>Using PVC in Pod</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: app
+    image: nginx
+    volumeMounts:
+    - mountPath: /data
+      name: storage
+  volumes:
+  - name: storage
+    persistentVolumeClaim:
+      claimName: pvc-1</code></pre>
+
+            <div class="info-box">
+                <h4>Access Modes</h4>
+                <ul>
+                    <li><strong>ReadWriteOnce (RWO):</strong> Single node read-write</li>
+                    <li><strong>ReadOnlyMany (ROX):</strong> Multiple nodes read-only</li>
+                    <li><strong>ReadWriteMany (RWX):</strong> Multiple nodes read-write</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🏪 StorageClass</h2>
+            <p>Dynamic provisioning of PersistentVolumes.</p>
+
+            <pre><code>apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp3
+  iopsPerGB: "10"
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer</code></pre>
+
+            <pre><code># List storage classes
+kubectl get sc
+
+# Set default storage class
+kubectl patch storageclass fast -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+# PVC using StorageClass
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dynamic-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: fast
+  resources:
+    requests:
+      storage: 20Gi</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔧 ConfigMaps</h2>
+            
+            <pre><code># Create from literal
+kubectl create configmap app-config --from-literal=key1=value1 --from-literal=key2=value2
+
+# Create from file
+kubectl create configmap app-config --from-file=config.properties
+
+# Create from directory
+kubectl create configmap app-config --from-file=configs/
+
+# YAML manifest
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  database_url: "postgres://db:5432"
+  log_level: "info"
+  config.yaml: |
+    server:
+      port: 8080
+      host: 0.0.0.0</code></pre>
+
+            <h3>Using ConfigMap</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+spec:
+  containers:
+  - name: app
+    image: myapp:1.0
+    # As environment variables
+    envFrom:
+    - configMapRef:
+        name: app-config
+    # Specific keys
+    env:
+    - name: DB_URL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: database_url
+    # As volume
+    volumeMounts:
+    - name: config
+      mountPath: /etc/config
+  volumes:
+  - name: config
+    configMap:
+      name: app-config</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔐 Secrets</h2>
+            
+            <pre><code># Create generic secret
+kubectl create secret generic db-secret \
+  --from-literal=username=admin \
+  --from-literal=password=secret123
+
+# Create from file
+kubectl create secret generic ssh-key --from-file=ssh-privatekey=/path/to/key
+
+# TLS secret
+kubectl create secret tls tls-secret --cert=path/to/cert --key=path/to/key
+
+# Docker registry secret
+kubectl create secret docker-registry regcred \
+  --docker-server=myregistry.com \
+  --docker-username=user \
+  --docker-password=pass \
+  --docker-email=email@example.com
+
+# YAML (base64 encoded)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: MWYyZDFlMmU2N2Rm
+# OR plain text (automatically encoded)
+stringData:
+  username: admin
+  password: secret123</code></pre>
+
+            <h3>Using Secrets</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-pod
+spec:
+  containers:
+  - name: app
+    image: myapp:1.0
+    env:
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: db-secret
+          key: password
+    volumeMounts:
+    - name: secret-volume
+      mountPath: /etc/secrets
+      readOnly: true
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: db-secret
+  # Use docker registry secret
+  imagePullSecrets:
+  - name: regcred</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ Storage Commands</h2>
+            
+            <pre><code># PV/PVC operations
+kubectl get pv
+kubectl get pvc
+kubectl describe pv pv-1
+kubectl describe pvc pvc-1
+
+# Delete PVC (may delete PV based on reclaim policy)
+kubectl delete pvc pvc-1
+
+# ConfigMaps
+kubectl get cm
+kubectl describe cm app-config
+kubectl edit cm app-config
+kubectl create cm app-config --from-literal=key=value --dry-run=client -o yaml
+
+# Secrets
+kubectl get secrets
+kubectl describe secret mysecret
+kubectl get secret mysecret -o jsonpath='{.data.password}' | base64 -d
+
+# Decode all secret data
+kubectl get secret mysecret -o json | jq '.data | map_values(@base64d)'</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Module 4 Key Points</h2>
+            <ul>
+                <li>✅ emptyDir: Temporary storage, deleted with pod</li>
+                <li>✅ hostPath: Node filesystem access</li>
+                <li>✅ PV: Cluster-level storage resource</li>
+                <li>✅ PVC: User request for storage</li>
+                <li>✅ StorageClass: Dynamic PV provisioning</li>
+                <li>✅ ReclaimPolicy: Retain, Delete, Recycle</li>
+                <li>✅ ConfigMap: Non-sensitive configuration</li>
+                <li>✅ Secret: Sensitive data (base64 encoded)</li>
+                <li>✅ VolumeBindingMode: Immediate vs WaitForFirstConsumer</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="module3-networking.html" class="btn-nav secondary">← Module 3: Networking</a>
+            <a href="module5-security.html" class="btn-nav">Next: Security →</a>
+        </div>
+    </div>
+</body>
+</html>

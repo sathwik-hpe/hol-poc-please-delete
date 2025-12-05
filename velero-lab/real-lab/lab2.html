@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2: Creating Your First Backup - Velero Lab</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="lab-container">
+        <!-- Instructions Panel -->
+        <div class="instructions-panel">
+            <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 20px; margin: -20px -20px 20px -20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <a href="../../index.html" style="color: #01a982; text-decoration: none; opacity: 0.9; font-size: 0.85em;">
+                    🏠 Home
+                </a>
+                <span style="color: rgba(255,255,255,0.4); margin: 0 8px;">›</span>
+                <a href="../index.html" style="color: #01a982; text-decoration: none; opacity: 0.9; font-size: 0.85em;">
+                    Velero Lab
+                </a>
+                <span style="color: rgba(255,255,255,0.4); margin: 0 8px;">›</span>
+                <span style="color: rgba(255,255,255,0.7); font-size: 0.85em;">Exercise 2</span>
+            </div>
+            <div class="lab-header">
+                <h1>Exercise 2: Creating Your First Backup</h1>
+                <div class="meta">
+                    <span class="badge badge-info">30 minutes</span>
+                    <span class="badge badge-success">Hands-On</span>
+                </div>
+            </div>
+
+            <div class="exercise-nav">
+                <a href="index.html" class="nav-btn">Exercise 1</a>
+                <a href="lab2.html" class="nav-btn active">Exercise 2</a>
+                <a href="lab3.html" class="nav-btn">Exercise 3</a>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 66%;">Exercise 2 of 3</div>
+            </div>
+
+            <!-- Step 1: Create Demo Application -->
+            <div class="step">
+                <h2>🚀 Step 1: Deploy a Sample Application</h2>
+                <p>Let's create a simple nginx application with some configuration to backup.</p>
+                
+                <h3>Create demo-app Namespace</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl create namespace demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>namespace/demo-app created</pre>
+                </div>
+
+                <h3>Deploy Nginx Application</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: demo-app
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: demo-app
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: demo-app
+data:
+  database_url: "postgresql://db.example.com:5432/myapp"
+  api_key: "demo-api-key-12345"
+  environment: "production"
+  version: "v1.0.0"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+  namespace: demo-app
+type: Opaque
+stringData:
+  admin_password: "super-secret-password"
+  jwt_secret: "jwt-signing-key-xyz"
+EOF</pre>
+                </div>
+
+                <h3>Verify Application is Running</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get all,configmap,secret -n demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME                                   READY   STATUS    RESTARTS   AGE
+pod/nginx-deployment-xyz-abc           1/1     Running   0          30s
+pod/nginx-deployment-xyz-def           1/1     Running   0          30s
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/nginx-service   ClusterIP   10.96.123.456   <none>        80/TCP    30s
+
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/nginx-deployment   2/2     2            2           30s
+
+NAME                         DATA   AGE
+configmap/app-config         4      30s
+
+NAME                  TYPE     DATA   AGE
+secret/app-secret     Opaque   2      30s</pre>
+                </div>
+
+                <div class="checkpoint">
+                    <h4><span class="checkpoint-icon">✅</span>Checkpoint 1</h4>
+                    <p>Verify all resources are created and pods are Running!</p>
+                </div>
+            </div>
+
+            <!-- Step 2: Create Backup Using kubectl -->
+            <div class="step">
+                <h2>💾 Step 2: Create Your First Backup</h2>
+                <p>Now let's backup the entire demo-app namespace using Velero.</p>
+                
+                <h3>Option A: Using Velero CLI (Recommended)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>velero backup create demo-app-backup-$(date +%Y%m%d-%H%M%S) \
+  --include-namespaces demo-app \
+  --wait</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 What's Happening:</strong>
+                    <ul>
+                        <li><code>--include-namespaces demo-app</code> - Only backup this namespace</li>
+                        <li><code>--wait</code> - Wait for backup to complete before returning</li>
+                        <li><code>$(date...)</code> - Adds timestamp to backup name</li>
+                    </ul>
+                </div>
+
+                <h3>Option B: Using kubectl (Alternative)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl apply -f - <<EOF
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: demo-app-backup-$(date +%Y%m%d-%H%M%S)
+  namespace: velero
+  annotations:
+    description: "First backup of demo application"
+spec:
+  includedNamespaces:
+  - demo-app
+  storageLocation: default
+  ttl: 720h0m0s
+  includeClusterResources: true
+EOF</pre>
+                </div>
+
+                <div class="info-box note">
+                    <strong>📝 Note:</strong>
+                    The backup will take 30-60 seconds. You can watch progress in the next step.
+                </div>
+            </div>
+
+            <!-- Step 3: Monitor Backup Progress -->
+            <div class="step">
+                <h2>👀 Step 3: Monitor Backup Progress</h2>
+                <p>Let's watch the backup as it completes.</p>
+                
+                <h3>Watch Backup Status</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get backups -n velero -w</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Progression:</h4>
+                    <pre>NAME                              STATUS        CREATED                         
+demo-app-backup-20251204-103000   New           2025-12-04T10:30:00Z
+demo-app-backup-20251204-103000   InProgress    2025-12-04T10:30:05Z
+demo-app-backup-20251204-103000   Completed     2025-12-04T10:30:45Z</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Tip:</strong>
+                    Press <kbd>Ctrl+C</kbd> to stop watching once status is <strong>Completed</strong>.
+                </div>
+
+                <h3>Get Detailed Backup Information</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre># Replace with your backup name
+BACKUP_NAME=$(kubectl get backups -n velero -o jsonpath='{.items[0].metadata.name}')
+echo "Latest backup: $BACKUP_NAME"
+
+kubectl describe backup $BACKUP_NAME -n velero</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Key Information to Look For:</h4>
+                    <pre>Status:
+  Phase:                  Completed
+  Start Timestamp:        2025-12-04T10:30:00Z
+  Completion Timestamp:   2025-12-04T10:30:45Z
+  Progress:
+    Items Backed Up:  15
+    Total Items:      15</pre>
+                </div>
+
+                <h3>Using Velero CLI for Details</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>velero backup describe $BACKUP_NAME --details</pre>
+                </div>
+
+                <div class="checkpoint">
+                    <h4><span class="checkpoint-icon">✅</span>Checkpoint 2</h4>
+                    <p><strong>Success Criteria:</strong></p>
+                    <ul>
+                        <li>Backup Phase is <strong>Completed</strong></li>
+                        <li>Items Backed Up matches Total Items</li>
+                        <li>No errors or warnings</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 4: Verify Backup in MinIO -->
+            <div class="step">
+                <h2>🗄️ Step 4: Verify Backup in Object Storage</h2>
+                <p>Let's confirm the backup data was stored in MinIO.</p>
+                
+                <h3>List Backups in MinIO</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>mc ls -r velero-minio/velero-backups/backups/</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>[2025-12-04 10:30:45 PST]  1.2KiB STANDARD backups/demo-app-backup-20251204-103000/
+[2025-12-04 10:30:45 PST]   512B  STANDARD backups/demo-app-backup-20251204-103000/velero-backup.json
+...</pre>
+                </div>
+
+                <h3>Check Backup Size</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>mc du velero-minio/velero-backups/backups/</pre>
+                </div>
+
+                <div class="info-box note">
+                    <strong>📝 What's Stored:</strong>
+                    <ul>
+                        <li>Kubernetes resource definitions (YAML)</li>
+                        <li>ConfigMap and Secret data</li>
+                        <li>Metadata and logs</li>
+                        <li>Volume snapshots (if PVCs exist)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 5: Create Another Backup with Labels -->
+            <div class="step">
+                <h2>🏷️ Step 5: Advanced Backup with Label Selectors</h2>
+                <p>Create a more selective backup using label selectors.</p>
+                
+                <h3>Label Some Resources</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl label deployment nginx-deployment -n demo-app backup=critical</pre>
+                </div>
+
+                <h3>Create Backup with Label Selector</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>velero backup create demo-app-critical-$(date +%Y%m%d-%H%M%S) \
+  --include-namespaces demo-app \
+  --selector backup=critical \
+  --wait</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Use Case:</strong>
+                    Label selectors are useful when you only want to backup specific resources, like critical databases or stateful applications.
+                </div>
+
+                <h3>Compare Backup Sizes</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>velero backup get</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME                                  STATUS      CREATED                         EXPIRES   
+demo-app-backup-20251204-103000       Completed   2025-12-04 10:30:00 +0000 UTC   29d
+demo-app-critical-20251204-104500     Completed   2025-12-04 10:45:00 +0000 UTC   29d</pre>
+                </div>
+            </div>
+
+            <!-- Step 6: Understanding Backup Contents -->
+            <div class="step">
+                <h2>🔍 Step 6: Explore Backup Contents</h2>
+                <p>Let's understand what's inside a backup.</p>
+                
+                <h3>Download Backup Manifest</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>velero backup download $BACKUP_NAME</pre>
+                </div>
+
+                <div class="info-box note">
+                    <strong>📝 Note:</strong>
+                    This downloads the backup to a local directory for inspection.
+                </div>
+
+                <h3>View Backed-Up Resources</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre># List all resources in the backup
+velero backup describe $BACKUP_NAME --details | grep -A 100 "Resource List"</pre>
+                </div>
+
+                <h3>Check Backup Logs</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>velero backup logs $BACKUP_NAME</pre>
+                </div>
+
+                <div class="info-box important">
+                    <strong>⚠️ Important:</strong>
+                    Always check backup logs for warnings or errors, especially in production environments.
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="step">
+                <h2>🎉 Exercise 2 Complete!</h2>
+                <p>Great job! You've successfully created and verified backups.</p>
+                
+                <h3>What You Learned:</h3>
+                <ul>
+                    <li>✅ Deployed a sample application with multiple resources</li>
+                    <li>✅ Created backups using Velero CLI and kubectl</li>
+                    <li>✅ Monitored backup progress and status</li>
+                    <li>✅ Verified backups in object storage (MinIO)</li>
+                    <li>✅ Used label selectors for selective backups</li>
+                    <li>✅ Inspected backup contents and logs</li>
+                </ul>
+
+                <h3>Quick Reference: Backup Commands</h3>
+                <div class="code-block">
+                    <pre># Create backup
+velero backup create <name> --include-namespaces <namespace>
+
+# List backups
+velero backup get
+
+# Describe backup
+velero backup describe <name>
+
+# View backup logs
+velero backup logs <name>
+
+# Delete backup
+velero backup delete <name></pre>
+                </div>
+
+                <h3>Key Takeaways:</h3>
+                <div class="info-box tip">
+                    <strong>💡 Best Practices:</strong>
+                    <ul>
+                        <li>Use meaningful backup names with timestamps</li>
+                        <li>Set appropriate TTL (Time To Live) for retention</li>
+                        <li>Use label selectors for granular control</li>
+                        <li>Always verify backups completed successfully</li>
+                        <li>Check object storage to ensure data is persisted</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <a href="lab3.html" class="btn btn-primary" style="font-size: 1.1em; padding: 15px 40px;">
+                        Proceed to Exercise 3: Restore →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Panel -->
+        <div class="terminal-panel">
+            <!-- Terminal Status Bar -->
+            <div class="terminal-header" style="background: #2d3748; color: white; padding: 12px 20px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="terminal-status-dot" style="font-size: 1.5em; animation: pulse 2s infinite;">●</span>
+                    <span id="terminal-status-text" style="font-size: 0.95em;">Checking terminal...</span>
+                </div>
+                <button id="terminal-reconnect-btn" onclick="reconnectTerminal()" style="display: none; background: #667eea; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">Reconnect</button>
+            </div>
+
+            <!-- Embedded Terminal (shown when connected) -->
+            <div id="terminal-embed-container" style="display: none; height: calc(100vh - 60px);">
+                <iframe 
+                    id="terminal-iframe"
+                    src="http://localhost:7681"
+                    style="width: 100%; height: 100%; border: none; background: #1e1e1e;"
+                    title="Interactive Terminal"
+                    allow="clipboard-read; clipboard-write">
+                </iframe>
+            </div>
+
+            <!-- Setup Instructions (shown when NOT connected) -->
+            <div id="terminal-setup-instructions" style="display: block; padding: 30px; background: #1e1e1e; color: #e2e8f0; height: calc(100vh - 60px); overflow-y: auto;">
+                <div style="background: #2d3748; padding: 20px; border-radius: 8px; border-left: 4px solid #fbbf24;">
+                    <h3 style="color: #fbbf24; margin-top: 0;">⚠️ Terminal Not Connected</h3>
+                    <p style="line-height: 1.6;">The interactive terminal is not running. If you completed Exercise 1 setup, just click "Reconnect" above.</p>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h4 style="color: #667eea; font-size: 1.1em;">Quick Setup (if you skipped Exercise 1):</h4>
+                    <div style="background: #0d1117; padding: 15px; border-radius: 6px; margin-top: 10px; border: 1px solid #30363d;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="color: #8b949e; font-size: 0.85em;">Copy and run in your local terminal:</span>
+                            <button onclick="copySetupCommand()" style="background: #238636; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em;">Copy</button>
+                        </div>
+                        <pre id="setup-command" style="color: #c9d1d9; margin: 0; white-space: pre-wrap; word-wrap: break-word;">cd /Users/kondapus/Desktop/glcp/hol/velero-lab && ./start-lab.sh</pre>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; padding: 15px; background: #1c2128; border-radius: 8px; text-align: center; color: #8b949e; font-size: 0.9em;">
+                    <p style="margin: 0;">💡 <strong>Already running?</strong> Click the "Reconnect" button above or refresh this page.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    #terminal-status-dot.connected {
+        color: #48bb78;
+        animation: none;
+    }
+    
+    #terminal-status-dot.disconnected {
+        color: #f56565;
+        animation: none;
+    }
+    
+    #terminal-status-dot.connecting {
+        color: #ed8936;
+        animation: pulse 1s infinite;
+    }
+    </style>
+
+    <script>
+        let terminalCheckInterval;
+        let terminalConnected = false;
+
+        async function checkTerminalServer() {
+            const statusDot = document.getElementById('terminal-status-dot');
+            const statusText = document.getElementById('terminal-status-text');
+            const iframe = document.getElementById('terminal-embed-container');
+            const instructions = document.getElementById('terminal-setup-instructions');
+            const reconnectBtn = document.getElementById('terminal-reconnect-btn');
+            
+            try {
+                const response = await fetch('http://localhost:7681', {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                
+                terminalConnected = true;
+                statusDot.className = 'connected';
+                statusDot.style.color = '#48bb78';
+                statusDot.style.animation = 'none';
+                statusText.textContent = '🟢 Connected - Terminal Ready';
+                iframe.style.display = 'block';
+                instructions.style.display = 'none';
+                reconnectBtn.style.display = 'none';
+                
+                if (terminalCheckInterval) {
+                    clearInterval(terminalCheckInterval);
+                }
+                
+            } catch (error) {
+                terminalConnected = false;
+                statusDot.className = 'disconnected';
+                statusDot.style.color = '#f56565';
+                statusDot.style.animation = 'none';
+                statusText.textContent = '🔴 Not Connected - Setup Required';
+                iframe.style.display = 'none';
+                instructions.style.display = 'block';
+                reconnectBtn.style.display = 'block';
+            }
+        }
+
+        function reconnectTerminal() {
+            const statusDot = document.getElementById('terminal-status-dot');
+            const statusText = document.getElementById('terminal-status-text');
+            
+            statusDot.className = 'connecting';
+            statusText.textContent = '🟠 Connecting...';
+            
+            setTimeout(checkTerminalServer, 1000);
+            terminalCheckInterval = setInterval(checkTerminalServer, 5000);
+        }
+
+        function copySetupCommand() {
+            const command = document.getElementById('setup-command').textContent.trim();
+            const btn = event.target;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(command).then(() => {
+                    showButtonSuccess(btn);
+                }).catch(err => {
+                    fallbackCopySetup(command, btn);
+                });
+            } else {
+                fallbackCopySetup(command, btn);
+            }
+        }
+
+        function fallbackCopySetup(text, btn) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            
+            try {
+                textarea.select();
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showButtonSuccess(btn);
+                } else {
+                    showButtonFailure(btn);
+                }
+            } catch (err) {
+                showButtonFailure(btn);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function showButtonSuccess(btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#238636';
+            }, 2000);
+        }
+
+        function showButtonFailure(btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✗ Failed';
+            btn.style.background = '#dc3545';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#238636';
+            }, 3000);
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.querySelector('pre').textContent.trim();
+            
+            // Method 1: Try modern Clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showCopySuccess(button);
+                }).catch(err => {
+                    console.warn('Clipboard API failed, trying fallback:', err);
+                    fallbackCopy(code, button);
+                });
+            } else {
+                // Method 2: Fallback for older browsers or HTTP
+                fallbackCopy(code, button);
+            }
+        }
+
+        function fallbackCopy(text, button) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '0';
+            document.body.appendChild(textarea);
+            
+            try {
+                textarea.focus();
+                textarea.select();
+                const successful = document.execCommand('copy');
+                
+                if (successful) {
+                    showCopySuccess(button);
+                } else {
+                    showCopyFailure(button);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                showCopyFailure(button);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function showCopySuccess(button) {
+            const originalText = button.textContent;
+            button.textContent = '✓ Copied!';
+            button.style.background = '#28a745';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#667eea';
+            }, 2000);
+        }
+
+        function showCopyFailure(button) {
+            const originalText = button.textContent;
+            button.textContent = '✗ Select & Copy';
+            button.style.background = '#dc3545';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#667eea';
+            }, 3000);
+        }
+
+        // Check on page load
+        checkTerminalServer();
+        terminalCheckInterval = setInterval(checkTerminalServer, 5000);
+        setTimeout(() => {
+            if (terminalCheckInterval && !terminalConnected) {
+                clearInterval(terminalCheckInterval);
+                terminalCheckInterval = setInterval(checkTerminalServer, 30000);
+            }
+        }, 120000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/python.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/tokyo-night-dark.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.8;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-back {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .nav-back:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #01a982;
+        }
+
+        .doc-title {
+            color: #01a982;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 2rem 4rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(96, 165, 250, 0.1);
+            border-top: 3px solid #01a982;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .content {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .content h1 {
+            color: #f1f5f9;
+            font-size: 2.5em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            font-weight: 800;
+            background: linear-gradient(135deg, #01a982 0%, #00c896 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .content h2 {
+            color: #f1f5f9;
+            font-size: 1.8em;
+            margin: 2rem 0 1rem;
+            font-weight: 700;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .content h3 {
+            color: #cbd5e1;
+            font-size: 1.4em;
+            margin: 1.5rem 0 0.8rem;
+            font-weight: 600;
+        }
+
+        .content h4 {
+            color: #94a3b8;
+            font-size: 1.2em;
+            margin: 1rem 0 0.5rem;
+            font-weight: 600;
+        }
+
+        .content p {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .content ul, .content ol {
+            margin: 1rem 0 1rem 2rem;
+            color: #cbd5e1;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .content a {
+            color: #01a982;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #01a982;
+        }
+
+        .content code {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.88em;
+            color: #a5b4fc;
+            font-weight: 500;
+        }
+
+        .content pre {
+            background: #1a1b26;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .content pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: #e2e8f0;
+            font-size: 0.88em;
+            font-family: 'Fira Code', 'Monaco', 'Menlo', 'Courier New', monospace;
+            line-height: 1.7;
+        }
+
+        /* Add language badge to code blocks */
+        .content pre::before {
+            content: '';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(96, 165, 250, 0.1);
+            color: #01a982;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* White paper specific styling */
+        .content > p:first-of-type {
+            font-size: 1.15em;
+            color: #cbd5e1;
+            line-height: 2;
+            margin-bottom: 2rem;
+        }
+
+        /* Author and date metadata */
+        .content > p strong:first-child {
+            display: inline-block;
+            margin-right: 1rem;
+            color: #01a982;
+        }
+
+        /* Better section spacing for white papers */
+        .content h2 + p,
+        .content h3 + p,
+        .content h4 + p {
+            margin-top: 1rem;
+        }
+
+        /* Highlight key findings, takeaways */
+        .content blockquote p strong {
+            color: #fbbf24;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .toc h2 {
+            color: #01a982;
+            font-size: 1.3em;
+            margin-bottom: 1rem;
+            border: none;
+            padding: 0;
+        }
+
+        .toc ul {
+            margin: 0;
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+        }
+
+        .toc a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: block;
+            padding: 0.3rem 0;
+        }
+
+        .toc a:hover {
+            color: #01a982;
+            padding-left: 0.5rem;
+        }
+
+        /* Document metadata */
+        .doc-metadata {
+            background: rgba(96, 165, 250, 0.05);
+            border-left: 4px solid #01a982;
+            padding: 1rem 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .doc-metadata p {
+            margin: 0.3rem 0;
+            font-size: 0.95em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #01a982;
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: #94a3b8;
+            font-style: italic;
+            background: rgba(59, 130, 246, 0.05);
+            padding: 1rem 1rem 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .content th {
+            background: rgba(59, 130, 246, 0.1);
+            color: #f1f5f9;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .content td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+        }
+
+        .content tr:last-child td {
+            border-bottom: none;
+        }
+
+        .content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .content hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 2rem 0;
+        }
+
+        .content strong {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .content em {
+            color: #a5b4fc;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 80px 1rem 2rem;
+            }
+            
+            .content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .content h1 {
+                font-size: 2em;
+            }
+            
+            .content h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <span class="doc-title" id="doc-title">Loading...</span>
+            <a href="javascript:history.back()" class="nav-back">
+                <span>←</span> Back
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading document...</p>
+        </div>
+        <div class="content" id="content" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Configure marked for better code rendering
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch (err) {}
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Function to generate table of contents
+        function generateTableOfContents() {
+            const content = document.getElementById('content');
+            const headings = content.querySelectorAll('h2, h3');
+            
+            if (headings.length === 0) return;
+            
+            let tocHTML = '<div class="toc"><h2>📑 Table of Contents</h2><ul>';
+            
+            headings.forEach((heading, index) => {
+                const level = heading.tagName === 'H2' ? 0 : 20;
+                const text = heading.textContent;
+                const id = heading.id || 'section-' + index;
+                heading.id = id;
+                
+                tocHTML += `<li style="margin-left: ${level}px;">
+                    <a href="#${id}">${text}</a>
+                </li>`;
+            });
+            
+            tocHTML += '</ul></div>';
+            
+            // Insert TOC after the first horizontal rule or after metadata
+            const firstHR = content.querySelector('hr');
+            const metadata = content.querySelector('.doc-metadata');
+            const insertAfter = firstHR || metadata || content.querySelector('h1');
+            
+            if (insertAfter) {
+                const tocDiv = document.createElement('div');
+                tocDiv.innerHTML = tocHTML;
+                insertAfter.insertAdjacentElement('afterend', tocDiv.firstChild);
+            }
+        }
+
+        // Get the markdown file path from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const mdFile = urlParams.get('doc');
+
+        if (mdFile) {
+            fetch(mdFile)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Document not found');
+                    }
+                    return response.text();
+                })
+                .then(markdown => {
+                    // Parse markdown to HTML with syntax highlighting
+                    const html = marked.parse(markdown);
+                    
+                    // Display content
+                    document.getElementById('content').innerHTML = html;
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                    
+                    // Apply syntax highlighting to any remaining code blocks
+                    document.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                    });
+                    
+                    // Add IDs to headings for linking
+                    let headingCount = 0;
+                    document.querySelectorAll('#content h2, #content h3').forEach((heading) => {
+                        if (!heading.id) {
+                            heading.id = 'heading-' + (++headingCount);
+                        }
+                    });
+                    
+                    // Generate Table of Contents if document has many sections
+                    const h2s = document.querySelectorAll('#content h2');
+                    if (h2s.length > 3) {
+                        generateTableOfContents();
+                    }
+                    
+                    // Wrap metadata lines (Author, Date, etc.) in a styled div
+                    const firstH1 = document.querySelector('#content h1');
+                    if (firstH1 && firstH1.nextElementSibling) {
+                        let metadataHTML = '';
+                        let currentElement = firstH1.nextElementSibling;
+                        
+                        // Collect metadata paragraphs
+                        while (currentElement && currentElement.tagName === 'P' && 
+                               (currentElement.textContent.includes('Author:') || 
+                                currentElement.textContent.includes('Date:') || 
+                                currentElement.textContent.includes('Version:') ||
+                                currentElement.textContent.includes('Category:') ||
+                                currentElement.textContent.includes('Tags:') ||
+                                currentElement.textContent.includes('Estimated Time:') ||
+                                currentElement.textContent.includes('Difficulty:'))) {
+                            metadataHTML += currentElement.outerHTML;
+                            const nextEl = currentElement.nextElementSibling;
+                            currentElement.remove();
+                            currentElement = nextEl;
+                        }
+                        
+                        // Insert metadata div after h1
+                        if (metadataHTML) {
+                            const metadataDiv = document.createElement('div');
+                            metadataDiv.className = 'doc-metadata';
+                            metadataDiv.innerHTML = metadataHTML;
+                            firstH1.insertAdjacentElement('afterend', metadataDiv);
+                        }
+                    }
+                    
+                    // Extract and set title from first h1 or use filename
+                    const h1 = document.querySelector('#content h1');
+                    const title = h1 ? h1.textContent : mdFile.split('/').pop().replace('.md', '');
+                    document.getElementById('doc-title').textContent = title;
+                    document.title = title;
+                })
+                .catch(error => {
+                    document.getElementById('loading').innerHTML = `
+                        <div style="color: #f87171;">
+                            <h2>⚠️ Error Loading Document</h2>
+                            <p>${error.message}</p>
+                            <a href="javascript:history.back()" style="color: #01a982;">← Go Back</a>
+                        </div>
+                    `;
+                });
+        } else {
+            document.getElementById('loading').innerHTML = `
+                <div style="color: #fbbf24;">
+                    <h2>⚠️ No Document Specified</h2>
+                    <p>Please specify a document using the ?doc= parameter</p>
+                    <a href="javascript:history.back()" style="color: #01a982;">← Go Back</a>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

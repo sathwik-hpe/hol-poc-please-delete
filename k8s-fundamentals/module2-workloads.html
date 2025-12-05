@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Workloads & Pods - CKA Prep</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%);
+            color: #e2e8f0;
+            line-height: 1.7;
+        }
+
+        .navbar {
+            background: rgba(13, 31, 45, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(1, 169, 130, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #01a982;
+            text-decoration: none;
+        }
+
+        .breadcrumb {
+            padding: 1rem 2rem;
+            background: rgba(13, 31, 45, 0.6);
+            border-bottom: 1px solid rgba(1, 169, 130, 0.1);
+        }
+
+        .breadcrumb-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .breadcrumb a {
+            color: #01a982;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: #00c896; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .module-header {
+            background: rgba(1, 169, 130, 0.1);
+            border-left: 4px solid #01a982;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .module-header h1 {
+            font-size: 2.5rem;
+            color: #01a982;
+            margin-bottom: 0.5rem;
+        }
+
+        .module-header p {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+        }
+
+        .content-section {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(1, 169, 130, 0.1);
+        }
+
+        h2 {
+            color: #01a982;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(1, 169, 130, 0.3);
+        }
+
+        h3 {
+            color: #00c896;
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        h4 {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+            color: #cbd5e1;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: rgba(1, 169, 130, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Fira Code', monospace;
+            color: #00c896;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1e293b;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(1, 169, 130, 0.2);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #e2e8f0;
+        }
+
+        .info-box {
+            background: rgba(1, 169, 130, 0.1);
+            border-left: 4px solid #01a982;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.warning {
+            background: rgba(251, 191, 36, 0.1);
+            border-left-color: #fbbf24;
+        }
+
+        .info-box.tip {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+
+        .info-box h4 {
+            color: #01a982;
+            margin-top: 0;
+        }
+
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #01a982 0%, #00c896 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(1, 169, 130, 0.3);
+        }
+
+        .btn-nav.secondary {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(1, 169, 130, 0.3);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(1, 169, 130, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(1, 169, 130, 0.1);
+        }
+
+        th {
+            background: rgba(1, 169, 130, 0.1);
+            color: #01a982;
+            font-weight: 600;
+        }
+
+        .yaml-example {
+            position: relative;
+        }
+
+        .yaml-label {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(1, 169, 130, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            color: #01a982;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#01a982;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00c896;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="../index.html">🏠 Home</a>
+            <span>›</span>
+            <a href="index.html">Kubernetes Fundamentals</a>
+            <span>›</span>
+            <span>Module 2: Workloads & Pods</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="module-header">
+            <h1>Module 2: Workloads & Pods</h1>
+            <p>Master pods, deployments, and all Kubernetes workload types. Learn how to run, manage, and troubleshoot containerized applications.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 What is a Pod?</h2>
+            <p>A <strong>Pod</strong> is the smallest deployable unit in Kubernetes. It represents a single instance of a running process in your cluster and can contain one or more containers.</p>
+            
+            <h3>Key Characteristics</h3>
+            <ul>
+                <li><strong>Atomic Unit:</strong> Pods are created, scheduled, and destroyed as a unit</li>
+                <li><strong>Shared Network:</strong> All containers in a pod share the same IP address and port space</li>
+                <li><strong>Shared Storage:</strong> Containers can share volumes within the pod</li>
+                <li><strong>Ephemeral:</strong> Pods are mortal - they are created and destroyed, never "resurrected"</li>
+                <li><strong>Single Node:</strong> All containers in a pod run on the same node</li>
+            </ul>
+
+            <div class="info-box">
+                <h4>📌 CKA Exam Tip</h4>
+                <p>Understanding pod lifecycle is critical. Know the pod phases: <code>Pending</code>, <code>Running</code>, <code>Succeeded</code>, <code>Failed</code>, <code>Unknown</code>. You'll troubleshoot pods that are stuck in these states.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>📝 Creating Pods</h2>
+            
+            <h3>Method 1: Imperative (Quick)</h3>
+            <pre><code># Create a simple nginx pod
+kubectl run nginx --image=nginx
+
+# Create pod with specific port
+kubectl run nginx --image=nginx --port=80
+
+# Create pod with labels
+kubectl run nginx --image=nginx --labels="app=web,env=prod"
+
+# Create pod and expose it
+kubectl run nginx --image=nginx --port=80 --expose
+
+# Dry run - generate YAML without creating
+kubectl run nginx --image=nginx --dry-run=client -o yaml</code></pre>
+
+            <h3>Method 2: Declarative (Production)</h3>
+            <div class="yaml-example">
+                <span class="yaml-label">pod.yaml</span>
+                <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+    tier: frontend
+  annotations:
+    description: "Simple nginx web server"
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.21
+    ports:
+    - containerPort: 80
+      name: http
+      protocol: TCP
+    env:
+    - name: ENVIRONMENT
+      value: "production"
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"</code></pre>
+            </div>
+
+            <pre><code># Apply the pod
+kubectl apply -f pod.yaml
+
+# Create/update with record
+kubectl apply -f pod.yaml --record
+
+# View created pod
+kubectl get pod nginx-pod
+
+# Detailed information
+kubectl describe pod nginx-pod</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔄 Pod Lifecycle</h2>
+            
+            <h3>Pod Phases</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Description</th>
+                        <th>What to Check</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Pending</code></td>
+                        <td>Pod accepted but not running yet</td>
+                        <td>Scheduling issues, image pull problems</td>
+                    </tr>
+                    <tr>
+                        <td><code>Running</code></td>
+                        <td>Pod bound to node, at least one container running</td>
+                        <td>Container logs, readiness probes</td>
+                    </tr>
+                    <tr>
+                        <td><code>Succeeded</code></td>
+                        <td>All containers terminated successfully</td>
+                        <td>Normal for Jobs</td>
+                    </tr>
+                    <tr>
+                        <td><code>Failed</code></td>
+                        <td>All containers terminated, at least one failed</td>
+                        <td>Exit codes, error logs</td>
+                    </tr>
+                    <tr>
+                        <td><code>Unknown</code></td>
+                        <td>Cannot determine pod state</td>
+                        <td>Node communication issues</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Container States</h3>
+            <ul>
+                <li><strong>Waiting:</strong> Container not running (pulling image, waiting for init containers)</li>
+                <li><strong>Running:</strong> Container executing without issues</li>
+                <li><strong>Terminated:</strong> Container finished execution or failed</li>
+            </ul>
+
+            <pre><code># Check pod status
+kubectl get pods
+
+# Detailed status with conditions
+kubectl get pods -o wide
+
+# Watch pod status in real-time
+kubectl get pods -w
+
+# Get pod with additional columns
+kubectl get pods -o custom-columns=NAME:.metadata.name,STATUS:.status.phase,IP:.status.podIP,NODE:.spec.nodeName</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📦 Multi-Container Patterns</h2>
+            
+            <h3>Sidecar Pattern</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: app-with-sidecar
+spec:
+  containers:
+  - name: main-app
+    image: myapp:1.0
+    ports:
+    - containerPort: 8080
+  - name: log-shipper
+    image: fluent-bit:latest
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log
+  volumes:
+  - name: logs
+    emptyDir: {}</code></pre>
+
+            <h3>Init Containers</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  initContainers:
+  - name: init-myservice
+    image: busybox
+    command: ['sh', '-c', 'until nslookup myservice; do sleep 2; done']
+  containers:
+  - name: myapp
+    image: myapp:1.0</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🚀 Deployments</h2>
+            <p>Deployments provide declarative updates for Pods and ReplicaSets.</p>
+
+            <pre><code># Quick create
+kubectl create deployment nginx --image=nginx --replicas=3
+
+# Scale
+kubectl scale deployment nginx --replicas=5
+
+# Update image
+kubectl set image deployment/nginx nginx=nginx:1.22
+
+# Rollback
+kubectl rollout undo deployment/nginx
+
+# Check status
+kubectl rollout status deployment/nginx
+
+# View history
+kubectl rollout history deployment/nginx</code></pre>
+
+            <div class="yaml-example">
+                <span class="yaml-label">deployment.yaml</span>
+                <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 StatefulSets</h2>
+            <p>For stateful applications requiring stable network identities and persistent storage.</p>
+
+            <pre><code>apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  serviceName: "nginx"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi</code></pre>
+
+            <div class="info-box">
+                <h4>StatefulSet Guarantees</h4>
+                <ul>
+                    <li>Ordered deployment and scaling (web-0, web-1, web-2)</li>
+                    <li>Stable network identity via Headless Service</li>
+                    <li>Persistent storage follows pod across rescheduling</li>
+                    <li>Ordered graceful deletion and termination</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>⚙️ DaemonSets</h2>
+            <p>Ensures a copy of a pod runs on all (or some) nodes.</p>
+
+            <pre><code>apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+spec:
+  selector:
+    matchLabels:
+      name: fluentd
+  template:
+    metadata:
+      labels:
+        name: fluentd
+    spec:
+      containers:
+      - name: fluentd
+        image: fluentd:latest
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log</code></pre>
+
+            <p><strong>Common Use Cases:</strong> Node monitoring (node-exporter), log collection (fluentd), storage daemons</p>
+        </div>
+
+        <div class="content-section">
+            <h2>⏱️ Jobs & CronJobs</h2>
+            
+            <h3>Job - Run to Completion</h3>
+            <pre><code>apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  completions: 3
+  parallelism: 2
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: perl:5.34
+        command: ["perl", "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+      restartPolicy: Never</code></pre>
+
+            <h3>CronJob - Scheduled</h3>
+            <pre><code>apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup
+spec:
+  schedule: "0 2 * * *"  # 2 AM daily
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: backup-tool:latest
+            args:
+            - /bin/sh
+            - -c
+            - backup.sh
+          restartPolicy: OnFailure</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ Quick CKA Commands</h2>
+            
+            <pre><code># Generate YAML templates fast
+kubectl run nginx --image=nginx --dry-run=client -o yaml > pod.yaml
+kubectl create deployment web --image=nginx --dry-run=client -o yaml > deploy.yaml
+kubectl create job test --image=busybox --dry-run=client -o yaml > job.yaml
+
+# Edit resources
+kubectl edit deployment nginx
+kubectl edit pod nginx
+
+# Delete with grace
+kubectl delete pod nginx --grace-period=0 --force
+
+# Logs
+kubectl logs nginx
+kubectl logs -f nginx  # follow
+kubectl logs nginx -c container-name  # specific container
+kubectl logs --previous nginx  # previous instance
+
+# Execute commands
+kubectl exec -it nginx -- /bin/bash
+kubectl exec nginx -- ls /
+
+# Copy files
+kubectl cp nginx:/tmp/file.txt ./file.txt
+kubectl cp ./file.txt nginx:/tmp/
+
+# Resource usage
+kubectl top pods
+kubectl top nodes
+
+# Describe for troubleshooting
+kubectl describe pod nginx
+kubectl get events --sort-by='.lastTimestamp'</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Module 2 Key Takeaways</h2>
+            <ul>
+                <li>✅ Pods: smallest unit, share network/storage, ephemeral</li>
+                <li>✅ Deployments: declarative updates, rolling updates, rollbacks</li>
+                <li>✅ StatefulSets: ordered deployment, stable identity, persistent storage</li>
+                <li>✅ DaemonSets: one pod per node for monitoring/logging</li>
+                <li>✅ Jobs: run-to-completion tasks</li>
+                <li>✅ CronJobs: scheduled tasks</li>
+                <li>✅ Multi-container patterns: sidecar, init containers</li>
+                <li>✅ Probes: liveness (restart), readiness (traffic), startup</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="module1-architecture.html" class="btn-nav secondary">← Module 1: Architecture</a>
+            <a href="module3-networking.html" class="btn-nav">Next: Networking →</a>
+        </div>
+    </div>
+</body>
+</html>

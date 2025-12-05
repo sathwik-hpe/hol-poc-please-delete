@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CI/CD Pipelines for Kubernetes - Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; min-height: 100vh; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .hero { text-align: center; padding: 3rem 2rem; background: rgba(1, 169, 130, 0.05); border-radius: 1rem; margin-bottom: 3rem; }
+        .hero h1 { font-size: 2.5rem; color: #01a982; margin-bottom: 1rem; }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 2rem; margin-bottom: 1rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); padding-bottom: 0.5rem; }
+        h3 { color: #00c896; font-size: 1.5rem; margin: 1.5rem 0 1rem; }
+        p, li { color: #cbd5e1; }
+        ul { margin: 1rem 0 1rem 2rem; }
+        li { margin-bottom: 0.5rem; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1rem; margin: 1rem 0; border-radius: 0.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>🚀 CI/CD Pipelines for Kubernetes</h1>
+            <p>Build automated CI/CD pipelines with GitHub Actions, Docker, and GitOps for Kubernetes deployments.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 CI/CD Overview</h2>
+            <div class="info-box">
+                <p><strong>CI/CD Pipeline Stages:</strong></p>
+                <ul>
+                    <li><strong>Build</strong>: Compile code, run unit tests</li>
+                    <li><strong>Test</strong>: Integration tests, security scans</li>
+                    <li><strong>Package</strong>: Build container images</li>
+                    <li><strong>Deploy</strong>: Push to registry, update K8s manifests</li>
+                    <li><strong>Verify</strong>: Smoke tests, health checks</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🔧 GitHub Actions Pipeline</h2>
+            
+            <h3>Complete Workflow (.github/workflows/deploy.yml)</h3>
+            <pre><code>name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Run tests
+      run: |
+        go test ./... -v
+        go test ./... -race -coverprofile=coverage.out
+    
+    - name: Lint
+      uses: golangci/golangci-lint-action@v3
+
+  build-image:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=sha,prefix={{branch}}-
+          type=ref,event=branch
+          type=semver,pattern={{version}}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+  security-scan:
+    needs: build-image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+  deploy:
+    needs: security-scan
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: your-org/k8s-manifests
+        token: ${{ secrets.PAT }}
+    
+    - name: Update image tag
+      run: |
+        cd overlays/production
+        kustomize edit set image \
+          app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+    
+    - name: Commit and push
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add .
+        git commit -m "Update image to ${{ github.sha }}"
+        git push</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🐳 Dockerfile Best Practices</h2>
+            <pre><code># Multi-stage build for Go app
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+COPY go.* ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# Final image
+FROM alpine:3.19
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+COPY --from=builder /app/main .
+
+USER 1000:1000
+EXPOSE 8080
+
+CMD ["./main"]</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📦 GitOps with ArgoCD</h2>
+            
+            <h3>Application Manifest</h3>
+            <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/k8s-manifests
+    targetRevision: HEAD
+    path: overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true</code></pre>
+
+            <h3>Kustomize Structure</h3>
+            <pre><code># base/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- deployment.yaml
+- service.yaml
+- ingress.yaml
+
+images:
+- name: app
+  newName: ghcr.io/your-org/app
+  newTag: latest
+
+# overlays/production/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ../../base
+
+replicas:
+- name: myapp
+  count: 3
+
+patches:
+- path: hpa.yaml
+- path: resources.yaml</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🧪 Testing Strategies</h2>
+            
+            <h3>Unit Tests</h3>
+            <pre><code># Run in CI
+go test ./... -v -race -coverprofile=coverage.out
+
+# Coverage report
+go tool cover -html=coverage.out -o coverage.html
+
+# Fail if coverage < 80%
+go test ./... -coverprofile=coverage.out
+go tool cover -func=coverage.out | grep total | awk '{if ($3+0 < 80) exit 1}'</code></pre>
+
+            <h3>Integration Tests</h3>
+            <pre><code># Docker Compose for dependencies
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: test
+  
+  redis:
+    image: redis:7-alpine
+
+# Run tests
+docker-compose up -d
+go test ./integration/... -tags=integration
+docker-compose down</code></pre>
+
+            <h3>Smoke Tests (Post-Deploy)</h3>
+            <pre><code>#!/bin/bash
+# smoke-test.sh
+
+ENDPOINT="https://myapp.example.com"
+
+# Health check
+if ! curl -f $ENDPOINT/health; then
+  echo "Health check failed"
+  exit 1
+fi
+
+# Basic functionality
+RESPONSE=$(curl -s $ENDPOINT/api/version)
+if [[ "$RESPONSE" != *"v1.0.0"* ]]; then
+  echo "Version check failed"
+  exit 1
+fi
+
+echo "Smoke tests passed"</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔒 Security Scanning</h2>
+            
+            <h3>Trivy (Container Scanning)</h3>
+            <pre><code># Scan image
+trivy image myapp:latest
+
+# Fail on HIGH/CRITICAL
+trivy image --severity HIGH,CRITICAL --exit-code 1 myapp:latest
+
+# Scan filesystem
+trivy fs .
+
+# GitHub Action
+- name: Run Trivy
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: 'myapp:latest'
+    severity: 'CRITICAL,HIGH'</code></pre>
+
+            <h3>SAST (Static Analysis)</h3>
+            <pre><code># Go security checker
+- name: Gosec Security Scanner
+  uses: securego/gosec@master
+  with:
+    args: './...'
+
+# SonarQube
+- name: SonarQube Scan
+  uses: sonarsource/sonarqube-scan-action@master
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 Deployment Strategies</h2>
+            
+            <h3>Blue-Green Deployment</h3>
+            <pre><code># Service points to blue initially
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  selector:
+    app: myapp
+    version: blue  # Switch to green after validation
+
+---
+# Blue deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: blue
+    spec:
+      containers:
+      - name: app
+        image: myapp:v1
+
+---
+# Green deployment (new version)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+      version: green
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: green
+    spec:
+      containers:
+      - name: app
+        image: myapp:v2
+
+# After validation, update service selector to "green"
+# Then delete blue deployment</code></pre>
+
+            <h3>Canary Deployment (Argo Rollouts)</h3>
+            <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: myapp
+spec:
+  replicas: 10
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause: {duration: 1m}
+      - setWeight: 25
+      - pause: {duration: 1m}
+      - setWeight: 50
+      - pause: {duration: 1m}
+      - setWeight: 75
+      - pause: {duration: 1m}
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: app
+        image: myapp:latest</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔄 Rollback Strategies</h2>
+            <pre><code># ArgoCD rollback
+argocd app rollback myapp
+
+# Kubectl rollback
+kubectl rollout undo deployment/myapp
+kubectl rollout undo deployment/myapp --to-revision=2
+
+# Helm rollback
+helm rollback myapp
+helm rollback myapp 3  # to specific revision
+
+# Check rollout history
+kubectl rollout history deployment/myapp</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📈 Pipeline Monitoring</h2>
+            
+            <h3>Metrics to Track</h3>
+            <ul>
+                <li><strong>Deployment Frequency</strong>: How often you deploy</li>
+                <li><strong>Lead Time</strong>: Commit to production time</li>
+                <li><strong>MTTR</strong>: Mean time to recovery</li>
+                <li><strong>Change Failure Rate</strong>: % of failed deployments</li>
+            </ul>
+
+            <h3>GitHub Actions Badges</h3>
+            <pre><code># README.md
+![CI/CD](https://github.com/your-org/repo/workflows/CI%2FCD%20Pipeline/badge.svg)
+![Coverage](https://img.shields.io/codecov/c/github/your-org/repo)</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Best Practices</h2>
+            <ul>
+                <li>✅ Use multi-stage Docker builds for smaller images</li>
+                <li>✅ Run security scans on every build</li>
+                <li>✅ Tag images with git commit SHA for traceability</li>
+                <li>✅ Separate code repo from manifest repo (GitOps)</li>
+                <li>✅ Use automated rollbacks on failure</li>
+                <li>✅ Implement gradual rollouts (canary/blue-green)</li>
+                <li>✅ Run smoke tests after deployment</li>
+                <li>✅ Use resource limits in K8s manifests</li>
+                <li>✅ Store secrets in vault/sealed-secrets, not git</li>
+                <li>✅ Monitor deployment metrics (DORA metrics)</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 Key Takeaways</h2>
+            <ul>
+                <li>✅ Automate everything: build, test, scan, deploy</li>
+                <li>✅ GitOps: Git as single source of truth</li>
+                <li>✅ Immutable infrastructure: Never patch, always redeploy</li>
+                <li>✅ Security scanning in pipeline (shift-left)</li>
+                <li>✅ Progressive delivery: Canary and blue-green</li>
+                <li>✅ Fast feedback loops: Fail fast, recover faster</li>
+                <li>✅ Observability: Monitor deployments and pipelines</li>
+                <li>✅ Rollback strategy: Always have a plan B</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

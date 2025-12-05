@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: Kubernetes Architecture - CKA Prep</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%);
+            color: #e2e8f0;
+            line-height: 1.7;
+        }
+
+        .navbar {
+            background: rgba(13, 31, 45, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(1, 169, 130, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #01a982;
+            text-decoration: none;
+        }
+
+        .breadcrumb {
+            padding: 1rem 2rem;
+            background: rgba(13, 31, 45, 0.6);
+            border-bottom: 1px solid rgba(1, 169, 130, 0.1);
+        }
+
+        .breadcrumb-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .breadcrumb a {
+            color: #01a982;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: #00c896; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .module-header {
+            background: rgba(1, 169, 130, 0.1);
+            border-left: 4px solid #01a982;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .module-header h1 {
+            font-size: 2.5rem;
+            color: #01a982;
+            margin-bottom: 0.5rem;
+        }
+
+        .module-header p {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+        }
+
+        .content-section {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(1, 169, 130, 0.1);
+        }
+
+        h2 {
+            color: #01a982;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(1, 169, 130, 0.3);
+        }
+
+        h3 {
+            color: #00c896;
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        h4 {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+            color: #cbd5e1;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: rgba(1, 169, 130, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Fira Code', monospace;
+            color: #00c896;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1e293b;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(1, 169, 130, 0.2);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #e2e8f0;
+        }
+
+        .info-box {
+            background: rgba(1, 169, 130, 0.1);
+            border-left: 4px solid #01a982;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.warning {
+            background: rgba(251, 191, 36, 0.1);
+            border-left-color: #fbbf24;
+        }
+
+        .info-box.tip {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+
+        .info-box h4 {
+            color: #01a982;
+            margin-top: 0;
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .component-card {
+            background: rgba(1, 169, 130, 0.05);
+            border: 1px solid rgba(1, 169, 130, 0.2);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .component-card h4 {
+            color: #01a982;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #01a982 0%, #00c896 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(1, 169, 130, 0.3);
+        }
+
+        .btn-nav.secondary {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(1, 169, 130, 0.3);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(1, 169, 130, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(1, 169, 130, 0.1);
+        }
+
+        th {
+            background: rgba(1, 169, 130, 0.1);
+            color: #01a982;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#01a982;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00c896;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="../index.html">🏠 Home</a>
+            <span>›</span>
+            <a href="index.html">Kubernetes Fundamentals</a>
+            <span>›</span>
+            <span>Module 1: Architecture</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="module-header">
+            <h1>Module 1: Kubernetes Architecture</h1>
+            <p>Deep dive into Kubernetes architecture, components, and how they work together to orchestrate containerized applications at scale.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>🏗️ What is Kubernetes?</h2>
+            <p>Kubernetes (K8s) is an open-source container orchestration platform originally designed by Google and now maintained by the Cloud Native Computing Foundation (CNCF). It automates the deployment, scaling, and management of containerized applications.</p>
+            
+            <h3>Key Capabilities</h3>
+            <ul>
+                <li><strong>Service Discovery & Load Balancing:</strong> Automatically expose containers using DNS names or IP addresses and distribute traffic</li>
+                <li><strong>Storage Orchestration:</strong> Mount storage systems of your choice (local, cloud providers, network storage)</li>
+                <li><strong>Automated Rollouts & Rollbacks:</strong> Declaratively describe desired state and change actual state at controlled rate</li>
+                <li><strong>Automatic Bin Packing:</strong> Optimize resource utilization by automatically placing containers based on resource requirements</li>
+                <li><strong>Self-Healing:</strong> Restart failed containers, replace containers, kill unresponsive containers</li>
+                <li><strong>Secret & Configuration Management:</strong> Store and manage sensitive information without rebuilding container images</li>
+            </ul>
+
+            <div class="info-box">
+                <h4>📌 CKA Exam Tip</h4>
+                <p>Understanding the architecture is fundamental to the CKA exam. You'll be tested on troubleshooting cluster components, understanding pod scheduling decisions, and knowing which component handles which functionality.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 Kubernetes Cluster Architecture</h2>
+            <p>A Kubernetes cluster consists of a set of machines called <strong>nodes</strong>. These nodes run containerized applications. Every cluster has at least one worker node and one control plane node.</p>
+            
+            <h3>High-Level Architecture Overview</h3>
+            <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                      CONTROL PLANE                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
+│  │  API Server  │  │  Scheduler   │  │Controller Manager│  │
+│  └──────────────┘  └──────────────┘  └─────────────────┘  │
+│         │                  │                   │            │
+│         └──────────────────┴───────────────────┘            │
+│                          │                                  │
+│                    ┌─────────┐                              │
+│                    │  etcd   │                              │
+│                    └─────────┘                              │
+└─────────────────────────────────────────────────────────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        │                   │                   │
+┌───────▼────────┐  ┌───────▼────────┐  ┌──────▼─────────┐
+│   Worker Node  │  │   Worker Node  │  │  Worker Node   │
+│ ┌────────────┐ │  │ ┌────────────┐ │  │ ┌────────────┐ │
+│ │  kubelet   │ │  │ │  kubelet   │ │  │ │  kubelet   │ │
+│ └────────────┘ │  │ └────────────┘ │  │ └────────────┘ │
+│ ┌────────────┐ │  │ ┌────────────┐ │  │ ┌────────────┐ │
+│ │ kube-proxy │ │  │ │ kube-proxy │ │  │ │ kube-proxy │ │
+│ └────────────┘ │  │ └────────────┘ │  │ └────────────┘ │
+│ ┌────────────┐ │  │ ┌────────────┐ │  │ ┌────────────┐ │
+│ │ Container  │ │  │ │ Container  │ │  │ │ Container  │ │
+│ │  Runtime   │ │  │ │  Runtime   │ │  │ │  Runtime   │ │
+│ └────────────┘ │  │ └────────────┘ │  │ └────────────┘ │
+└────────────────┘  └────────────────┘  └────────────────┘</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🎛️ Control Plane Components</h2>
+            <p>The control plane makes global decisions about the cluster (scheduling) and detects and responds to cluster events (starting a new pod when deployment's replicas field is unsatisfied).</p>
+
+            <div class="component-grid">
+                <div class="component-card">
+                    <h4>🔵 kube-apiserver</h4>
+                    <p><strong>The Front Door to Kubernetes</strong></p>
+                    <ul>
+                        <li>Exposes the Kubernetes API</li>
+                        <li>Processes REST operations</li>
+                        <li>Validates and configures API objects</li>
+                        <li>Horizontally scalable</li>
+                        <li>All cluster communication goes through API server</li>
+                    </ul>
+                </div>
+
+                <div class="component-card">
+                    <h4>💾 etcd</h4>
+                    <p><strong>Cluster State Database</strong></p>
+                    <ul>
+                        <li>Consistent, distributed key-value store</li>
+                        <li>Stores all cluster data</li>
+                        <li>Raft consensus algorithm for reliability</li>
+                        <li>Requires proper backup strategy</li>
+                        <li>Only API server talks to etcd</li>
+                    </ul>
+                </div>
+
+                <div class="component-card">
+                    <h4>📅 kube-scheduler</h4>
+                    <p><strong>Pod Placement Engine</strong></p>
+                    <ul>
+                        <li>Watches for newly created Pods</li>
+                        <li>Selects optimal node for pod placement</li>
+                        <li>Considers: resources, constraints, affinity rules</li>
+                        <li>Makes decision but doesn't run pods</li>
+                        <li>Can be customized or replaced</li>
+                    </ul>
+                </div>
+
+                <div class="component-card">
+                    <h4>🎮 kube-controller-manager</h4>
+                    <p><strong>Control Loop Manager</strong></p>
+                    <ul>
+                        <li>Runs controller processes</li>
+                        <li>Node Controller: monitors node health</li>
+                        <li>Job Controller: manages Job objects</li>
+                        <li>ReplicaSet Controller: maintains pod count</li>
+                        <li>Service Account Controller: creates default accounts</li>
+                    </ul>
+                </div>
+
+                <div class="component-card">
+                    <h4>☁️ cloud-controller-manager</h4>
+                    <p><strong>Cloud Provider Integration</strong></p>
+                    <ul>
+                        <li>Embeds cloud-specific control logic</li>
+                        <li>Node Controller: cloud-specific node management</li>
+                        <li>Route Controller: sets up routes in cloud</li>
+                        <li>Service Controller: creates cloud load balancers</li>
+                        <li>Optional, only for cloud deployments</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <h4>⚠️ Critical for CKA</h4>
+                <p>Know the static pod manifests location: <code>/etc/kubernetes/manifests/</code>. Control plane components run as static pods in most deployments. You may need to troubleshoot by editing these manifests.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>⚙️ Node Components</h2>
+            <p>Node components run on every worker node, maintaining running pods and providing the Kubernetes runtime environment.</p>
+
+            <div class="component-grid">
+                <div class="component-card">
+                    <h4>🔧 kubelet</h4>
+                    <p><strong>The Node Agent</strong></p>
+                    <ul>
+                        <li>Primary node agent that runs on each node</li>
+                        <li>Ensures containers in pods are running and healthy</li>
+                        <li>Takes PodSpecs from API server</li>
+                        <li>Reports node and pod status back to API server</li>
+                        <li>Manages container lifecycle via CRI (Container Runtime Interface)</li>
+                        <li>Does NOT manage containers not created by Kubernetes</li>
+                    </ul>
+                    <pre><code># Kubelet configuration file location
+/var/lib/kubelet/config.yaml
+
+# Kubelet service status
+systemctl status kubelet
+
+# View kubelet logs
+journalctl -u kubelet -f</code></pre>
+                </div>
+
+                <div class="component-card">
+                    <h4>🌐 kube-proxy</h4>
+                    <p><strong>Network Proxy</strong></p>
+                    <ul>
+                        <li>Maintains network rules on nodes</li>
+                        <li>Implements Kubernetes Service concept</li>
+                        <li>Handles routing for Service IPs</li>
+                        <li>Can use iptables, IPVS, or userspace modes</li>
+                        <li>Runs as DaemonSet on all nodes</li>
+                    </ul>
+                    <pre><code># Check kube-proxy mode
+kubectl logs -n kube-system kube-proxy-xxxxx | grep "Using"
+
+# View iptables rules (if using iptables mode)
+iptables -t nat -L -n -v | grep KUBE</code></pre>
+                </div>
+
+                <div class="component-card">
+                    <h4>📦 Container Runtime</h4>
+                    <p><strong>Container Execution Engine</strong></p>
+                    <ul>
+                        <li>Responsible for running containers</li>
+                        <li>Must implement Container Runtime Interface (CRI)</li>
+                        <li>Common options: containerd, CRI-O, Docker Engine</li>
+                        <li>Kubernetes deprecated dockershim in v1.24</li>
+                        <li>containerd is most common now</li>
+                    </ul>
+                    <pre><code># Check container runtime
+kubectl get nodes -o wide
+
+# Containerd commands
+crictl ps
+crictl images
+crictl logs [container-id]</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <h4>💡 CKA Tip: Node Troubleshooting</h4>
+                <p>If a node is NotReady, check these in order:</p>
+                <ol>
+                    <li><code>kubectl describe node [node-name]</code> - Check conditions and events</li>
+                    <li><code>systemctl status kubelet</code> - Verify kubelet is running</li>
+                    <li><code>journalctl -u kubelet -f</code> - Check kubelet logs</li>
+                    <li><code>crictl ps</code> - Verify container runtime is working</li>
+                    <li>Check disk space and resources on the node</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🔄 How Components Work Together</h2>
+            
+            <h3>Pod Creation Workflow</h3>
+            <p>Understanding how a pod gets created helps with troubleshooting:</p>
+            
+            <pre><code>1. User runs: kubectl create deployment nginx --image=nginx
+
+2. kubectl → API Server
+   - kubectl sends HTTP POST request
+   - API Server authenticates and authorizes request
+   - API Server validates deployment spec
+   - API Server stores deployment in etcd
+
+3. Controller Manager detects new deployment
+   - Deployment Controller creates ReplicaSet
+   - ReplicaSet Controller creates Pod objects
+   - Pod specs written to etcd via API Server
+
+4. Scheduler detects unscheduled pods
+   - Scheduler evaluates all nodes
+   - Considers: resources, taints, affinity, constraints
+   - Selects best node
+   - Updates Pod spec with nodeName field
+
+5. Kubelet on selected node detects pod assignment
+   - Kubelet reads pod spec from API Server
+   - Kubelet calls container runtime (containerd)
+   - Container runtime pulls image
+   - Container runtime creates and starts container
+
+6. Kubelet reports status back
+   - Sends pod status updates to API Server
+   - API Server updates etcd
+   - Pod transitions: Pending → Running → (Eventually) Completed/Failed</code></pre>
+
+            <h3>Service Discovery Workflow</h3>
+            <pre><code>1. Service is created
+   - Service object stored in etcd
+   - Service gets a ClusterIP assigned
+   
+2. Endpoints Controller watches
+   - Finds all pods matching service selector
+   - Creates/updates Endpoints object
+   
+3. kube-proxy on each node watches Services/Endpoints
+   - Creates iptables/IPVS rules
+   - Rules redirect traffic from ClusterIP to pod IPs
+   
+4. CoreDNS updates
+   - Watches for Service changes
+   - Creates DNS A records
+   - Services accessible via: service-name.namespace.svc.cluster.local</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 Component Communication</h2>
+            
+            <h3>Important Communication Patterns</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Protocol/Port</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>kubectl</td>
+                        <td>API Server</td>
+                        <td>HTTPS/6443</td>
+                        <td>All cluster interactions</td>
+                    </tr>
+                    <tr>
+                        <td>API Server</td>
+                        <td>etcd</td>
+                        <td>HTTPS/2379</td>
+                        <td>Read/write cluster state</td>
+                    </tr>
+                    <tr>
+                        <td>Scheduler</td>
+                        <td>API Server</td>
+                        <td>HTTPS/6443</td>
+                        <td>Watch pods, update bindings</td>
+                    </tr>
+                    <tr>
+                        <td>Controller Manager</td>
+                        <td>API Server</td>
+                        <td>HTTPS/6443</td>
+                        <td>Watch resources, make changes</td>
+                    </tr>
+                    <tr>
+                        <td>kubelet</td>
+                        <td>API Server</td>
+                        <td>HTTPS/6443</td>
+                        <td>Register node, get pod specs, report status</td>
+                    </tr>
+                    <tr>
+                        <td>kube-proxy</td>
+                        <td>API Server</td>
+                        <td>HTTPS/6443</td>
+                        <td>Watch services and endpoints</td>
+                    </tr>
+                    <tr>
+                        <td>API Server</td>
+                        <td>kubelet</td>
+                        <td>HTTPS/10250</td>
+                        <td>Get logs, exec, port-forward</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box warning">
+                <h4>🔒 Security Note</h4>
+                <p>All control plane communication is encrypted with TLS. Certificates are critical for cluster security. For CKA, know where certificates are stored: <code>/etc/kubernetes/pki/</code></p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 CKA Exam Practice Scenarios</h2>
+            
+            <h3>Scenario 1: Control Plane Component Failure</h3>
+            <div class="info-box">
+                <h4>Problem:</h4>
+                <p>The API Server is not responding. How do you troubleshoot?</p>
+                
+                <h4>Steps:</h4>
+                <pre><code># 1. Check if API server pod is running
+kubectl get pods -n kube-system | grep apiserver
+
+# 2. If not accessible, check on control plane node directly
+docker ps | grep apiserver
+# OR
+crictl ps | grep apiserver
+
+# 3. Check static pod manifest
+cat /etc/kubernetes/manifests/kube-apiserver.yaml
+
+# 4. Check logs
+crictl logs [container-id]
+
+# 5. Check systemd if using systemd
+systemctl status kube-apiserver
+
+# 6. Common issues:
+# - Certificate expiration
+# - etcd connectivity
+# - Misconfigured manifest
+# - Port conflicts</code></pre>
+            </div>
+
+            <h3>Scenario 2: Node Not Ready</h3>
+            <div class="info-box">
+                <h4>Problem:</h4>
+                <p>A worker node shows status "NotReady". Diagnose and fix.</p>
+                
+                <h4>Steps:</h4>
+                <pre><code># 1. Check node status
+kubectl get nodes
+kubectl describe node worker-1
+
+# Look for conditions:
+# - MemoryPressure: True
+# - DiskPressure: True
+# - PIDPressure: True
+# - Ready: False (this is bad)
+
+# 2. SSH to the node and check kubelet
+systemctl status kubelet
+journalctl -u kubelet -n 50 --no-pager
+
+# 3. Common causes:
+# - kubelet not running: systemctl start kubelet
+# - Network plugin issues
+# - Container runtime issues: systemctl status containerd
+# - Disk full: df -h
+# - Too many processes
+
+# 4. Restart kubelet if needed
+systemctl restart kubelet
+systemctl enable kubelet</code></pre>
+            </div>
+
+            <h3>Key Files and Directories (Memorize for CKA)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Path</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/etc/kubernetes/manifests/</code></td>
+                        <td>Static pod manifests (control plane components)</td>
+                    </tr>
+                    <tr>
+                        <td><code>/etc/kubernetes/pki/</code></td>
+                        <td>TLS certificates and keys</td>
+                    </tr>
+                    <tr>
+                        <td><code>/var/lib/kubelet/</code></td>
+                        <td>Kubelet data directory</td>
+                    </tr>
+                    <tr>
+                        <td><code>/var/lib/kubelet/config.yaml</code></td>
+                        <td>Kubelet configuration</td>
+                    </tr>
+                    <tr>
+                        <td><code>/etc/kubernetes/admin.conf</code></td>
+                        <td>Admin kubeconfig file</td>
+                    </tr>
+                    <tr>
+                        <td><code>/var/lib/etcd/</code></td>
+                        <td>etcd data directory</td>
+                    </tr>
+                    <tr>
+                        <td><code>/etc/systemd/system/kubelet.service.d/</code></td>
+                        <td>Kubelet systemd configuration</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Module 1 Summary</h2>
+            <p>You now understand:</p>
+            <ul>
+                <li>✅ Kubernetes cluster architecture (control plane + worker nodes)</li>
+                <li>✅ Control plane components: API Server, etcd, Scheduler, Controller Manager</li>
+                <li>✅ Node components: kubelet, kube-proxy, container runtime</li>
+                <li>✅ How components communicate with each other</li>
+                <li>✅ Pod creation and service discovery workflows</li>
+                <li>✅ Critical file locations for troubleshooting</li>
+                <li>✅ Common troubleshooting scenarios for CKA exam</li>
+            </ul>
+
+            <div class="info-box">
+                <h4>📚 Next Steps</h4>
+                <p>Now that you understand the architecture, you're ready to learn about <strong>Workloads & Pods</strong> - the actual applications running in your cluster.</p>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="index.html" class="btn-nav secondary">← Back to Modules</a>
+            <a href="module2-workloads.html" class="btn-nav">Next: Workloads & Pods →</a>
+        </div>
+    </div>
+</body>
+</html>

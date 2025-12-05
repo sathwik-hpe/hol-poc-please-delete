@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 1: Installing Velero - Velero Lab</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="lab-container">
+        <!-- Instructions Panel -->
+        <div class="instructions-panel">
+            <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 20px; margin: -20px -20px 20px -20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <a href="../../index.html" style="color: #01a982; text-decoration: none; opacity: 0.9; font-size: 0.85em;">
+                    🏠 Home
+                </a>
+                <span style="color: rgba(255,255,255,0.4); margin: 0 8px;">›</span>
+                <a href="../index.html" style="color: #01a982; text-decoration: none; opacity: 0.9; font-size: 0.85em;">
+                    Velero Lab
+                </a>
+                <span style="color: rgba(255,255,255,0.4); margin: 0 8px;">›</span>
+                <span style="color: rgba(255,255,255,0.7); font-size: 0.85em;">Exercise 1</span>
+            </div>
+            <div class="lab-header">
+                <h1>Exercise 1: Installing Velero</h1>
+                <div class="meta">
+                    <span class="badge badge-info">45 minutes</span>
+                    <span class="badge badge-warning">Kubernetes Required</span>
+                </div>
+            </div>
+
+            <div class="exercise-nav">
+                <a href="index.html" class="nav-btn active">Exercise 1</a>
+                <a href="lab2.html" class="nav-btn">Exercise 2</a>
+                <a href="lab3.html" class="nav-btn">Exercise 3</a>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 33%;">Exercise 1 of 3</div>
+            </div>
+
+            <!-- Step 0: Prerequisites and Setup -->
+            <div class="step" id="step0">
+                <h2>🚀 Step 0: Prerequisites and Setup (Required)</h2>
+                <p>Let's install everything needed for this lab. We'll install all tools and then set up the interactive terminal.</p>
+                
+                <div class="info-box warning">
+                    <strong>⚠️ Important:</strong> Complete all prerequisite installations before proceeding. This ensures a smooth lab experience.
+                </div>
+
+                <h3>A. Install Required Tools</h3>
+                <p>Copy each command below and run in your terminal. These tools are essential for the lab.</p>
+
+                <h4>1. Install kubectl (Kubernetes CLI)</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>brew install kubectl</pre>
+                </div>
+                
+                <div class="expected-output">
+                    <h4>Verify Installation:</h4>
+                    <pre>kubectl version --client</pre>
+                </div>
+
+                <h4>2. Install Kind (Kubernetes in Docker)</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>brew install kind</pre>
+                </div>
+                
+                <div class="expected-output">
+                    <h4>Verify Installation:</h4>
+                    <pre>kind version</pre>
+                </div>
+
+                <h4>3. Install Helm (Package Manager)</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>brew install helm</pre>
+                </div>
+                
+                <div class="expected-output">
+                    <h4>Verify Installation:</h4>
+                    <pre>helm version --short</pre>
+                </div>
+
+                <h4>4. Install MinIO Client (mc)</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>brew install minio/stable/mc</pre>
+                </div>
+                
+                <div class="expected-output">
+                    <h4>Verify Installation:</h4>
+                    <pre>mc --version</pre>
+                </div>
+
+                <h4>5. Install ttyd (Terminal Server)</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>brew install ttyd</pre>
+                </div>
+                
+                <div class="expected-output">
+                    <h4>Verify Installation:</h4>
+                    <pre>ttyd --version</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 One-Liner Installation:</strong> You can install all tools at once:
+                    <div class="code-block" style="margin-top: 10px;">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>brew install kubectl kind helm minio/stable/mc ttyd</pre>
+                    </div>
+                </div>
+
+                <h3>B. Create Kubernetes Cluster</h3>
+                <p>Create a local Kubernetes cluster using Kind:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kind create cluster --name velero-lab</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>Creating cluster "velero-lab" ...
+ ✓ Ensuring node image (kindest/node:v1.27.3) 🖼
+ ✓ Preparing nodes 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+Set kubectl context to "kind-velero-lab"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-velero-lab</pre>
+                </div>
+
+                <h4>Verify Cluster is Running</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl cluster-info</pre>
+                </div>
+
+                <h3>C. Setup Interactive Terminal</h3>
+                <p>Now let's set up the <strong>real, working terminal</strong> that will embed in your browser.</p>
+
+                <h4>Option 1: One-Click Setup (Easiest) ⭐</h4>
+                <p>This script starts both the lab server and terminal server:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>cd /Users/kondapus/Desktop/glcp/hol/velero-lab && ./start-lab.sh</pre>
+                </div>
+
+                <div class="info-box info">
+                    <strong>💡 What this does:</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Installs ttyd if needed (terminal server)</li>
+                        <li>Starts the terminal server on port 7681</li>
+                        <li>Keeps both servers running</li>
+                        <li>Press Ctrl+C to stop everything</li>
+                    </ul>
+                </div>
+
+                <h4>Option 2: Manual Setup (More Control)</h4>
+                <p>Start terminal server in a separate terminal window:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>ttyd -p 7681 -W zsh</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>[INFO] Listening on port: 7681</pre>
+                </div>
+
+                <h3>D. Verify Terminal Connection</h3>
+                <p>Once you've started the terminal server, look at the right panel →</p>
+                <p>You should see:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>🟢 <strong>Green indicator</strong>: "Connected to terminal server"</li>
+                    <li>A <strong>working terminal</strong> where you can type commands</li>
+                    <li>Your actual shell prompt (zsh/bash)</li>
+                </ul>
+
+                <div class="info-box tip">
+                    <strong>💡 Quick Test:</strong> Type <code>pwd</code> in the terminal on the right. If it shows your current directory, you're all set!
+                </div>
+
+                <h3>Troubleshooting</h3>
+                <details style="margin-top: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold;">🔴 Copy button not working?</summary>
+                    <div style="margin-top: 10px; padding-left: 15px;">
+                        <p><strong>Solution:</strong> Click on the code block, select all the text (Cmd+A or Ctrl+A), and copy manually (Cmd+C or Ctrl+C).</p>
+                        <p>The copy button may require HTTPS. Manual copy-paste always works!</p>
+                    </div>
+                </details>
+
+                <details style="margin-top: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold;">🔴 Still seeing red indicator?</summary>
+                    <div style="margin-top: 10px; padding-left: 15px;">
+                        <ol>
+                            <li>Make sure ttyd is running (check the terminal where you started it)</li>
+                            <li>Click the "Reconnect" button in the right panel</li>
+                            <li>Refresh this page</li>
+                            <li>Check if port 7681 is in use: <code>lsof -i :7681</code></li>
+                        </ol>
+                        <p style="margin-top: 10px;">
+                            <strong>Still not working?</strong> See detailed troubleshooting in 
+                            <a href="../TERMINAL-SETUP.md" target="_blank">TERMINAL-SETUP.md</a>
+                        </p>
+                    </div>
+                </details>
+
+                <h3>📚 Additional Resources</h3>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><a href="../QUICKSTART.md" target="_blank">QUICKSTART.md</a> - Quick setup guide</li>
+                    <li><a href="../TERMINAL-SETUP.md" target="_blank">TERMINAL-SETUP.md</a> - Comprehensive terminal server guide</li>
+                    <li><a href="../TESTING-GUIDE.md" target="_blank">TESTING-GUIDE.md</a> - How to test everything works</li>
+                </ul>
+
+                <div class="checkpoint">
+                    <div class="checkpoint-icon">✅</div>
+                    <div>
+                        <h3>Checkpoint: Prerequisites Complete</h3>
+                        <p>Before proceeding to Step 1, verify:</p>
+                        <ul style="margin-left: 20px;">
+                            <li>✅ All tools installed (kubectl, kind, helm, mc, ttyd)</li>
+                            <li>✅ Kubernetes cluster running (kind get clusters)</li>
+                            <li>✅ 🟢 Green indicator in right panel</li>
+                            <li>✅ You can type in the embedded terminal</li>
+                            <li>✅ Commands execute and show output</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Verify Setup -->
+            <div class="step">
+                <h2>📋 Step 1: Verify Your Setup</h2>
+                <p>Now let's verify your Kubernetes setup in the embedded terminal →</p>
+                
+                <h3>Check Kubernetes Cluster</h3>
+                <p>Verify your Kubernetes cluster is running:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl cluster-info</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>Kubernetes control plane is running at https://...
+CoreDNS is running at https://...</pre>
+                </div>
+
+                <h3>Check Helm Version</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>helm version --short</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>v3.12.0+g...</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Tip:</strong>
+                    If you don't have a Kubernetes cluster, you can quickly create one using Kind:
+                    <div class="code-block" style="margin-top: 10px;">
+                        <pre>kind create cluster --name velero-lab</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Set Up MinIO -->
+            <div class="step">
+                <h2>🗄️ Step 2: Deploy MinIO for Backup Storage</h2>
+                <p>We'll use MinIO as our S3-compatible backup storage. This runs inside your cluster for easy testing.</p>
+                
+                <h3>Create MinIO Namespace</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl create namespace minio</pre>
+                </div>
+
+                <h3>Deploy MinIO</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl apply -f - <<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+  namespace: minio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio:latest
+        args:
+        - server
+        - /storage
+        env:
+        - name: MINIO_ROOT_USER
+          value: "minio"
+        - name: MINIO_ROOT_PASSWORD
+          value: "minio123"
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: storage
+          mountPath: "/storage"
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: minio-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+  selector:
+    app: minio
+EOF</pre>
+                </div>
+
+                <h3>Wait for MinIO to be Ready</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=300s</pre>
+                </div>
+
+                <div class="checkpoint">
+                    <h4><span class="checkpoint-icon">✅</span>Checkpoint 1</h4>
+                    <p>MinIO should be running. Verify with:</p>
+                    <div class="code-block">
+                        <pre>kubectl get pods -n minio</pre>
+                    </div>
+                    <p>You should see <strong>STATUS: Running</strong></p>
+                </div>
+            </div>
+
+            <!-- Step 3: Create MinIO Bucket -->
+            <div class="step">
+                <h2>🪣 Step 3: Create Backup Bucket in MinIO</h2>
+                <p>We need to create a bucket where Velero will store backups.</p>
+                
+                <h3>Port-Forward to MinIO (Open New Terminal)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl port-forward -n minio svc/minio 9000:9000</pre>
+                </div>
+
+                <div class="info-box note">
+                    <strong>📝 Note:</strong>
+                    Keep this terminal open! Port-forwarding needs to stay active. Open a new terminal for the next commands.
+                </div>
+
+                <h3>Install MinIO Client (mc)</h3>
+                <p>For macOS/Linux:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+sudo mv mc /usr/local/bin/</pre>
+                </div>
+
+                <h3>Configure MinIO Client</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>mc alias set velero-minio http://localhost:9000 minio minio123</pre>
+                </div>
+
+                <h3>Create Bucket</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>mc mb velero-minio/velero-backups</pre>
+                </div>
+
+                <h3>Verify Bucket Exists</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>mc ls velero-minio</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>[2025-12-04 10:00:00 PST]     0B velero-backups/</pre>
+                </div>
+            </div>
+
+            <!-- Step 4: Prepare Velero Credentials -->
+            <div class="step">
+                <h2>🔑 Step 4: Create Velero Credentials File</h2>
+                <p>Velero needs credentials to access MinIO.</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>cat > /tmp/credentials-velero <<EOF
+[default]
+aws_access_key_id = minio
+aws_secret_access_key = minio123
+EOF</pre>
+                </div>
+
+                <h3>Verify Credentials File</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>cat /tmp/credentials-velero</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>[default]
+aws_access_key_id = minio
+aws_secret_access_key = minio123</pre>
+                </div>
+            </div>
+
+            <!-- Step 5: Install Velero -->
+            <div class="step">
+                <h2>🚀 Step 5: Install Velero with Helm</h2>
+                <p>Now we'll install Velero with production-grade configuration.</p>
+                
+                <h3>Add Velero Helm Repository</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+helm repo update</pre>
+                </div>
+
+                <h3>Install Velero</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>helm install velero vmware-tanzu/velero \
+  --namespace velero \
+  --create-namespace \
+  --set-file credentials.secretContents.cloud=/tmp/credentials-velero \
+  --set configuration.backupStorageLocation[0].name=default \
+  --set configuration.backupStorageLocation[0].provider=aws \
+  --set configuration.backupStorageLocation[0].bucket=velero-backups \
+  --set configuration.backupStorageLocation[0].config.region=minio \
+  --set configuration.backupStorageLocation[0].config.s3ForcePathStyle=true \
+  --set configuration.backupStorageLocation[0].config.s3Url=http://minio.minio.svc:9000 \
+  --set configuration.volumeSnapshotLocation[0].name=default \
+  --set configuration.volumeSnapshotLocation[0].provider=aws \
+  --set configuration.volumeSnapshotLocation[0].config.region=minio \
+  --set initContainers[0].name=velero-plugin-for-aws \
+  --set initContainers[0].image=velero/velero-plugin-for-aws:v1.9.0 \
+  --set initContainers[0].volumeMounts[0].mountPath=/target \
+  --set initContainers[0].volumeMounts[0].name=plugins \
+  --set deployNodeAgent=true \
+  --set snapshotsEnabled=true</pre>
+                </div>
+
+                <div class="info-box important">
+                    <strong>⚠️ Important Configuration:</strong>
+                    <ul>
+                        <li><code>s3ForcePathStyle=true</code> - Required for MinIO</li>
+                        <li><code>deployNodeAgent=true</code> - Enables file system backups</li>
+                        <li><code>s3Url=http://minio.minio.svc:9000</code> - Internal cluster DNS</li>
+                    </ul>
+                </div>
+
+                <h3>Watch Installation Progress</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get pods -n velero -w</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Tip:</strong>
+                    Press <kbd>Ctrl+C</kbd> to stop watching once pods are Running.
+                </div>
+            </div>
+
+            <!-- Step 6: Verify Installation -->
+            <div class="step">
+                <h2>✅ Step 6: Verify Velero Installation</h2>
+                <p>Let's make sure everything is working correctly.</p>
+                
+                <h3>Check Velero Pods</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get pods -n velero</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME                      READY   STATUS    RESTARTS   AGE
+velero-5d7c8f9d5-abc12    1/1     Running   0          2m
+node-agent-xyz45          1/1     Running   0          2m
+node-agent-def67          1/1     Running   0          2m</pre>
+                </div>
+
+                <h3>Check Backup Storage Location</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get backupstoragelocation -n velero</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME      PHASE       LAST VALIDATED   AGE   DEFAULT
+default   Available   10s              2m    true</pre>
+                </div>
+
+                <div class="info-box warning">
+                    <strong>⚠️ Troubleshooting:</strong>
+                    If Phase shows "Unavailable", check Velero logs:
+                    <div class="code-block" style="margin-top: 10px;">
+                        <pre>kubectl logs deployment/velero -n velero</pre>
+                    </div>
+                </div>
+
+                <h3>Verify Velero CLI (Optional but Recommended)</h3>
+                <p>Install Velero CLI for easier management:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre># For macOS
+brew install velero
+
+# For Linux
+wget https://github.com/vmware-tanzu/velero/releases/download/v1.12.0/velero-v1.12.0-linux-amd64.tar.gz
+tar -xvf velero-v1.12.0-linux-amd64.tar.gz
+sudo mv velero-v1.12.0-linux-amd64/velero /usr/local/bin/</pre>
+                </div>
+
+                <h3>Test Velero CLI</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>velero version</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>Client:
+        Version: v1.12.0
+Server:
+        Version: v1.12.0</pre>
+                </div>
+
+                <div class="checkpoint">
+                    <h4><span class="checkpoint-icon">✅</span>Final Checkpoint</h4>
+                    <p><strong>Success Criteria:</strong></p>
+                    <ul>
+                        <li>All Velero pods are <strong>Running</strong></li>
+                        <li>BackupStorageLocation Phase is <strong>Available</strong></li>
+                        <li>MinIO is accessible and bucket exists</li>
+                        <li>Velero CLI is installed (optional)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="step">
+                <h2>🎉 Congratulations!</h2>
+                <p>You've successfully installed Velero on your Kubernetes cluster!</p>
+                
+                <h3>What You Accomplished:</h3>
+                <ul>
+                    <li>✅ Deployed MinIO as S3-compatible storage</li>
+                    <li>✅ Created a backup bucket</li>
+                    <li>✅ Installed Velero with production configuration</li>
+                    <li>✅ Verified Backup Storage Location connectivity</li>
+                    <li>✅ Set up Velero CLI (optional)</li>
+                </ul>
+
+                <h3>Quick Reference Commands:</h3>
+                <div class="code-block">
+                    <pre># Check Velero status
+kubectl get pods -n velero
+
+# View backup storage location
+kubectl get backupstoragelocation -n velero
+
+# Check Velero logs
+kubectl logs deployment/velero -n velero
+
+# List backups (empty for now)
+kubectl get backups -n velero</pre>
+                </div>
+
+                <div class="info-box note">
+                    <strong>📝 Next Exercise:</strong>
+                    In Exercise 2, you'll create your first backup of a sample application!
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <a href="lab2.html" class="btn btn-primary" style="font-size: 1.1em; padding: 15px 40px;">
+                        Proceed to Exercise 2 →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Panel -->
+        <div class="terminal-panel">
+            <!-- Terminal Status Bar -->
+            <div class="terminal-header" style="background: #2d3748; color: white; padding: 12px 20px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="terminal-status-dot" style="font-size: 1.5em; animation: pulse 2s infinite;">●</span>
+                    <span id="terminal-status-text" style="font-size: 0.95em;">Checking terminal...</span>
+                </div>
+                <button id="terminal-reconnect-btn" onclick="reconnectTerminal()" style="display: none; background: #667eea; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">Reconnect</button>
+            </div>
+
+            <!-- Embedded Terminal (shown when connected) -->
+            <div id="terminal-embed-container" style="display: none; height: calc(100vh - 60px);">
+                <iframe 
+                    id="terminal-iframe"
+                    src="http://localhost:7681"
+                    style="width: 100%; height: 100%; border: none; background: #1e1e1e;"
+                    title="Interactive Terminal"
+                    allow="clipboard-read; clipboard-write">
+                </iframe>
+            </div>
+
+            <!-- Setup Instructions (shown when NOT connected) -->
+            <div id="terminal-setup-instructions" style="display: block; padding: 30px; background: #1e1e1e; color: #e2e8f0; height: calc(100vh - 60px); overflow-y: auto;">
+                <div style="background: #2d3748; padding: 20px; border-radius: 8px; border-left: 4px solid #fbbf24;">
+                    <h3 style="color: #fbbf24; margin-top: 0;">⚠️ Terminal Not Connected</h3>
+                    <p style="line-height: 1.6;">The interactive terminal is not running. Please complete <strong>Step 0</strong> in the left panel to activate it.</p>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h4 style="color: #667eea; font-size: 1.1em;">Quick Setup:</h4>
+                    <div style="background: #0d1117; padding: 15px; border-radius: 6px; margin-top: 10px; border: 1px solid #30363d;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="color: #8b949e; font-size: 0.85em;">Copy and run in your local terminal:</span>
+                            <button onclick="copySetupCommand()" style="background: #238636; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em;">Copy</button>
+                        </div>
+                        <pre id="setup-command" style="color: #c9d1d9; margin: 0; white-space: pre-wrap; word-wrap: break-word;">cd /Users/kondapus/Desktop/glcp/hol/velero-lab && ./start-lab.sh</pre>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #8b949e; font-size: 0.95em;">
+                        <strong>What this does:</strong> Installs and starts the terminal server, then you'll see a real working terminal here.
+                    </p>
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: #161b22; border-radius: 8px; border: 1px solid #30363d;">
+                    <h4 style="color: #7ee787; margin-top: 0;">Alternative: Manual Setup</h4>
+                    <ol style="line-height: 1.8; color: #c9d1d9; padding-left: 20px;">
+                        <li>Install ttyd: <code style="background: #0d1117; padding: 2px 8px; border-radius: 3px; color: #ffa657;">brew install ttyd</code></li>
+                        <li>Start server: <code style="background: #0d1117; padding: 2px 8px; border-radius: 3px; color: #ffa657;">ttyd -p 7681 -W zsh</code></li>
+                        <li>Refresh this page</li>
+                    </ol>
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: #0d1117; border-radius: 8px; border-left: 4px solid #58a6ff;">
+                    <h4 style="color: #58a6ff; margin-top: 0;">📚 Need Help?</h4>
+                    <ul style="list-style: none; padding: 0; line-height: 2;">
+                        <li>📖 <a href="../QUICKSTART.md" target="_blank" style="color: #58a6ff; text-decoration: none;">QUICKSTART.md</a> - Fast setup guide</li>
+                        <li>🔧 <a href="../TERMINAL-SETUP.md" target="_blank" style="color: #58a6ff; text-decoration: none;">TERMINAL-SETUP.md</a> - Detailed instructions</li>
+                        <li>🧪 <a href="../TESTING-GUIDE.md" target="_blank" style="color: #58a6ff; text-decoration: none;">TESTING-GUIDE.md</a> - Troubleshooting</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px; padding: 15px; background: #1c2128; border-radius: 8px; text-align: center; color: #8b949e; font-size: 0.9em;">
+                    <p style="margin: 0;">💡 <strong>Tip:</strong> You can also use your own terminal application (Terminal.app, iTerm2, etc.) if you prefer not to set up the embedded terminal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    #terminal-status-dot.connected {
+        color: #48bb78;
+        animation: none;
+    }
+    
+    #terminal-status-dot.disconnected {
+        color: #f56565;
+        animation: none;
+    }
+    
+    #terminal-status-dot.connecting {
+        color: #ed8936;
+        animation: pulse 1s infinite;
+    }
+    </style>
+
+    <script>
+        let terminalCheckInterval;
+        let terminalConnected = false;
+
+        // Check if terminal server is running
+        async function checkTerminalServer() {
+            const statusDot = document.getElementById('terminal-status-dot');
+            const statusText = document.getElementById('terminal-status-text');
+            const iframe = document.getElementById('terminal-embed-container');
+            const instructions = document.getElementById('terminal-setup-instructions');
+            const reconnectBtn = document.getElementById('terminal-reconnect-btn');
+            
+            try {
+                const response = await fetch('http://localhost:7681', {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                
+                // Terminal server is available
+                terminalConnected = true;
+                statusDot.className = 'connected';
+                statusDot.style.color = '#48bb78';
+                statusDot.style.animation = 'none';
+                statusText.textContent = '🟢 Connected - Terminal Ready';
+                iframe.style.display = 'block';
+                instructions.style.display = 'none';
+                reconnectBtn.style.display = 'none';
+                
+                // Stop checking after connection
+                if (terminalCheckInterval) {
+                    clearInterval(terminalCheckInterval);
+                }
+                
+            } catch (error) {
+                // Terminal server not available
+                terminalConnected = false;
+                statusDot.className = 'disconnected';
+                statusDot.style.color = '#f56565';
+                statusDot.style.animation = 'none';
+                statusText.textContent = '🔴 Not Connected - See Step 0';
+                iframe.style.display = 'none';
+                instructions.style.display = 'block';
+                reconnectBtn.style.display = 'block';
+            }
+        }
+
+        function reconnectTerminal() {
+            const statusDot = document.getElementById('terminal-status-dot');
+            const statusText = document.getElementById('terminal-status-text');
+            
+            statusDot.className = 'connecting';
+            statusText.textContent = '🟠 Connecting...';
+            
+            setTimeout(checkTerminalServer, 1000);
+            
+            // Resume periodic checking
+            terminalCheckInterval = setInterval(checkTerminalServer, 5000);
+        }
+
+        function copySetupCommand() {
+            const command = document.getElementById('setup-command').textContent.trim();
+            const btn = event.target;
+            
+            // Try modern API first, fallback to execCommand
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(command).then(() => {
+                    showButtonSuccess(btn);
+                }).catch(err => {
+                    console.warn('Clipboard API failed, trying fallback:', err);
+                    fallbackCopySetup(command, btn);
+                });
+            } else {
+                fallbackCopySetup(command, btn);
+            }
+        }
+
+        function fallbackCopySetup(text, btn) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            
+            try {
+                textarea.select();
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showButtonSuccess(btn);
+                } else {
+                    showButtonFailure(btn);
+                }
+            } catch (err) {
+                showButtonFailure(btn);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function showButtonSuccess(btn) {
+            const originalText = btn.textContent;
+            const originalBg = btn.style.background;
+            btn.textContent = '✓ Copied!';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = originalBg || '#238636';
+            }, 2000);
+        }
+
+        function showButtonFailure(btn) {
+            const originalText = btn.textContent;
+            const originalBg = btn.style.background;
+            btn.textContent = '✗ Failed';
+            btn.style.background = '#dc3545';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = originalBg || '#238636';
+            }, 3000);
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.querySelector('pre').textContent.trim();
+            
+            // Method 1: Try modern Clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showCopySuccess(button);
+                }).catch(err => {
+                    console.warn('Clipboard API failed, trying fallback:', err);
+                    fallbackCopy(code, button);
+                });
+            } else {
+                // Method 2: Fallback for older browsers or HTTP
+                fallbackCopy(code, button);
+            }
+        }
+
+        function fallbackCopy(text, button) {
+            // Create a temporary textarea element
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '0';
+            document.body.appendChild(textarea);
+            
+            try {
+                // Select and copy the text
+                textarea.focus();
+                textarea.select();
+                const successful = document.execCommand('copy');
+                
+                if (successful) {
+                    showCopySuccess(button);
+                } else {
+                    showCopyFailure(button);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                showCopyFailure(button);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function showCopySuccess(button) {
+            const originalText = button.textContent;
+            button.textContent = '✓ Copied!';
+            button.style.background = '#28a745';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#667eea';
+            }, 2000);
+        }
+
+        function showCopyFailure(button) {
+            const originalText = button.textContent;
+            button.textContent = '✗ Select & Copy';
+            button.style.background = '#dc3545';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#667eea';
+            }, 3000);
+        }
+
+        // Check on page load
+        checkTerminalServer();
+
+        // Check every 5 seconds for first 2 minutes
+        terminalCheckInterval = setInterval(checkTerminalServer, 5000);
+        setTimeout(() => {
+            if (terminalCheckInterval && !terminalConnected) {
+                clearInterval(terminalCheckInterval);
+                // Check less frequently after 2 minutes (every 30 seconds)
+                terminalCheckInterval = setInterval(checkTerminalServer, 30000);
+            }
+        }, 120000);
+
+        // Listen for iframe load
+        document.getElementById('terminal-iframe').addEventListener('load', function() {
+            console.log('Terminal iframe loaded successfully');
+        });
+    </script>
+</body>
+</html>

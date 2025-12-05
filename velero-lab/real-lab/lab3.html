@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 3: Disaster Recovery - Velero Lab</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="lab-container">
+        <!-- Instructions Panel -->
+        <div class="instructions-panel">
+            <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 20px; margin: -20px -20px 20px -20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <a href="../../index.html" style="color: #01a982; text-decoration: none; opacity: 0.9; font-size: 0.85em;">
+                    🏠 Home
+                </a>
+                <span style="color: rgba(255,255,255,0.4); margin: 0 8px;">›</span>
+                <a href="../index.html" style="color: #01a982; text-decoration: none; opacity: 0.9; font-size: 0.85em;">
+                    Velero Lab
+                </a>
+                <span style="color: rgba(255,255,255,0.4); margin: 0 8px;">›</span>
+                <span style="color: rgba(255,255,255,0.7); font-size: 0.85em;">Exercise 3</span>
+            </div>
+            <div class="lab-header">
+                <h1>Exercise 3: Disaster Recovery</h1>
+                <div class="meta">
+                    <span class="badge badge-info">30 minutes</span>
+                    <span class="badge badge-danger">Hands-On</span>
+                </div>
+            </div>
+
+            <div class="exercise-nav">
+                <a href="index.html" class="nav-btn">Exercise 1</a>
+                <a href="lab2.html" class="nav-btn">Exercise 2</a>
+                <a href="lab3.html" class="nav-btn active">Exercise 3</a>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%;">Exercise 3 of 3</div>
+            </div>
+
+            <div class="info-box warning">
+                <strong>⚠️ Prerequisites:</strong> Complete Exercise 1 and Exercise 2 before starting this exercise. You need a backup created in Exercise 2.
+            </div>
+
+            <!-- Step 1: Verify Existing Backup -->
+            <div class="step">
+                <h2>📋 Step 1: Verify Existing Backup</h2>
+                <p>Before simulating a disaster, let's verify we have a backup to restore from.</p>
+                
+                <h3>List Available Backups</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get backups -n velero</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME                STATUS      CREATED                         EXPIRES   STORAGE LOCATION   SELECTOR
+demo-app-backup-... Completed   2024-12-04 16:30:00 +0000 UTC   29d       default            <none></pre>
+                </div>
+
+                <h3>Check Backup Details</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl describe backup -n velero $(kubectl get backups -n velero -o jsonpath='{.items[0].metadata.name}')</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Tip:</strong> Make note of the backup name. You'll use it in the restore operation.
+                </div>
+
+                <h3>Verify Demo App is Running</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get all -n demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME                                    READY   STATUS    RESTARTS   AGE
+pod/nginx-deployment-...                1/1     Running   0          10m
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)
+service/nginx-service   ClusterIP   10.96.100.100   <none>        80/TCP
+
+NAME                               READY   UP-TO-DATE   AVAILABLE
+deployment.apps/nginx-deployment   2/2     2            2
+
+NAME                                          DESIRED   CURRENT   READY
+replicaset.apps/nginx-deployment-...          2         2         2</pre>
+                </div>
+            </div>
+
+            <!-- Step 2: Simulate Disaster -->
+            <div class="step">
+                <h2>💥 Step 2: Simulate a Disaster</h2>
+                <p>Let's simulate a disaster by deleting the entire namespace. This represents a catastrophic failure.</p>
+                
+                <div class="info-box warning">
+                    <strong>⚠️ Warning:</strong> This will delete all resources in the demo-app namespace. Make sure you have a backup!
+                </div>
+
+                <h3>Delete the Namespace</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl delete namespace demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>namespace "demo-app" deleted</pre>
+                </div>
+
+                <h3>Verify Everything is Gone</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get namespace demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>Error from server (NotFound): namespaces "demo-app" not found</pre>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get all -n demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>No resources found in demo-app namespace.</pre>
+                </div>
+
+                <div class="info-box note">
+                    <strong>📝 Real-World Scenario:</strong>
+                    <p>This simulates scenarios like:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Accidental deletion by team member</li>
+                        <li>Failed deployment that corrupted resources</li>
+                        <li>Cluster failure or data center outage</li>
+                        <li>Ransomware attack</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 3: Create Restore -->
+            <div class="step">
+                <h2>🔄 Step 3: Restore from Backup</h2>
+                <p>Now let's restore the application from our backup. Velero will recreate all resources.</p>
+
+                <h3>Create a Restore Resource</h3>
+                <p>First, get the backup name:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get backups -n velero</pre>
+                </div>
+
+                <p>Create the restore (replace BACKUP_NAME with your actual backup name):</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl apply -f - <<EOF
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: demo-app-restore-$(date +%Y%m%d-%H%M%S)
+  namespace: velero
+spec:
+  backupName: BACKUP_NAME
+  includedNamespaces:
+  - demo-app
+  restorePVs: true
+EOF</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Alternative:</strong> You can also use the Velero CLI if installed:
+                    <div class="code-block" style="margin-top: 10px;">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>velero restore create demo-app-restore \
+  --from-backup BACKUP_NAME \
+  --wait</pre>
+                    </div>
+                </div>
+
+                <h3>Quick Restore Command</h3>
+                <p>Here's a one-liner that automatically gets the latest backup:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>BACKUP_NAME=$(kubectl get backups -n velero -o jsonpath='{.items[0].metadata.name}') && \
+kubectl apply -f - <<EOF
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: demo-app-restore-$(date +%Y%m%d-%H%M%S)
+  namespace: velero
+spec:
+  backupName: $BACKUP_NAME
+  includedNamespaces:
+  - demo-app
+  restorePVs: true
+EOF</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>restore.velero.io/demo-app-restore-20241204-163000 created</pre>
+                </div>
+            </div>
+
+            <!-- Step 4: Monitor Restore Progress -->
+            <div class="step">
+                <h2>⏱️ Step 4: Monitor Restore Progress</h2>
+                <p>Watch the restore operation as it recreates all resources.</p>
+
+                <h3>Check Restore Status</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get restores -n velero</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME                              BACKUP              STATUS       STARTED                         COMPLETED                       ERRORS   WARNINGS   CREATED
+demo-app-restore-20241204-163000  demo-app-backup-... Completed    2024-12-04 16:30:00 +0000 UTC   2024-12-04 16:30:30 +0000 UTC   0        0          1m</pre>
+                </div>
+
+                <h3>Watch Restore in Real-Time</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get restores -n velero -w</pre>
+                </div>
+
+                <div class="info-box info">
+                    <strong>ℹ️ Restore Phases:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>New:</strong> Restore created, not started yet</li>
+                        <li><strong>InProgress:</strong> Actively restoring resources</li>
+                        <li><strong>Completed:</strong> All resources restored successfully</li>
+                        <li><strong>PartiallyFailed:</strong> Some resources failed (check logs)</li>
+                        <li><strong>Failed:</strong> Restore failed completely</li>
+                    </ul>
+                </div>
+
+                <h3>Describe Restore for Details</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl describe restore -n velero $(kubectl get restores -n velero -o jsonpath='{.items[0].metadata.name}')</pre>
+                </div>
+
+                <h3>Check Restore Logs</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl logs deployment/velero -n velero | grep -i restore</pre>
+                </div>
+
+                <div class="checkpoint">
+                    <div class="checkpoint-icon">✅</div>
+                    <div>
+                        <h3>Checkpoint: Restore Completed</h3>
+                        <p>Verify the restore shows:</p>
+                        <ul style="margin-left: 20px;">
+                            <li>Status: <strong>Completed</strong></li>
+                            <li>Errors: <strong>0</strong></li>
+                            <li>Warnings: <strong>0</strong> (or minimal)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Verify Restored Resources -->
+            <div class="step">
+                <h2>✅ Step 5: Verify Restored Resources</h2>
+                <p>Let's verify that all resources have been successfully restored.</p>
+
+                <h3>Check Namespace</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get namespace demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME       STATUS   AGE
+demo-app   Active   2m</pre>
+                </div>
+
+                <h3>Check All Resources</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get all -n demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>NAME                                    READY   STATUS    RESTARTS   AGE
+pod/nginx-deployment-...                1/1     Running   0          2m
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)
+service/nginx-service   ClusterIP   10.96.100.100   <none>        80/TCP
+
+NAME                               READY   UP-TO-DATE   AVAILABLE
+deployment.apps/nginx-deployment   2/2     2            2
+
+NAME                                          DESIRED   CURRENT   READY
+replicaset.apps/nginx-deployment-...          2         2         2</pre>
+                </div>
+
+                <h3>Check ConfigMap</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get configmap -n demo-app</pre>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl describe configmap app-config -n demo-app</pre>
+                </div>
+
+                <div class="expected-output">
+                    <h4>Expected Output:</h4>
+                    <pre>Data
+====
+api_key:
+----
+demo-api-key-12345
+database_url:
+----
+postgresql://db.example.com:5432/myapp
+environment:
+----
+production
+version:
+----
+v1.0.0</pre>
+                </div>
+
+                <h3>Check Secret</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get secret -n demo-app</pre>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl describe secret app-secret -n demo-app</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Tip:</strong> Secrets are restored but values remain encrypted. Velero handles secret encryption/decryption automatically.
+                </div>
+
+                <h3>Verify Pods are Running</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get pods -n demo-app -o wide</pre>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl logs -n demo-app deployment/nginx-deployment --tail=20</pre>
+                </div>
+            </div>
+
+            <!-- Step 6: Compare Before and After -->
+            <div class="step">
+                <h2>🔍 Step 6: Understanding What Was Restored</h2>
+                <p>Let's examine what Velero restored and how it compares to the original.</p>
+
+                <h3>Restore Statistics</h3>
+                <p>Get detailed statistics about the restore operation:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get restore -n velero $(kubectl get restores -n velero -o jsonpath='{.items[0].metadata.name}') -o jsonpath='{.status}' | jq</pre>
+                </div>
+
+                <div class="info-box info">
+                    <strong>ℹ️ What Gets Restored:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ Namespace and metadata</li>
+                        <li>✅ Deployments, ReplicaSets, Pods</li>
+                        <li>✅ Services and Endpoints</li>
+                        <li>✅ ConfigMaps and Secrets</li>
+                        <li>✅ Persistent Volumes (if enabled)</li>
+                        <li>✅ Custom Resources</li>
+                        <li>✅ Labels and Annotations</li>
+                    </ul>
+                </div>
+
+                <div class="info-box note">
+                    <strong>📝 What's Different:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Pod names will be different (new pods created)</li>
+                        <li>Pod IPs will be different</li>
+                        <li>Age/creation timestamps are new</li>
+                        <li>UIDs are regenerated</li>
+                    </ul>
+                </div>
+
+                <h3>View Restore Warnings (if any)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get restore -n velero $(kubectl get restores -n velero -o jsonpath='{.items[0].metadata.name}') -o jsonpath='{.status.warnings}' | jq</pre>
+                </div>
+
+                <h3>Check for Errors</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get restore -n velero $(kubectl get restores -n velero -o jsonpath='{.items[0].metadata.name}') -o jsonpath='{.status.errors}' | jq</pre>
+                </div>
+            </div>
+
+            <!-- Step 7: Advanced Restore Options -->
+            <div class="step">
+                <h2>🚀 Step 7: Advanced Restore Options</h2>
+                <p>Velero provides several options to customize restore operations.</p>
+
+                <h3>Restore to a Different Namespace</h3>
+                <p>You can restore resources to a different namespace:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl apply -f - <<EOF
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: demo-app-restore-different-ns
+  namespace: velero
+spec:
+  backupName: $(kubectl get backups -n velero -o jsonpath='{.items[0].metadata.name}')
+  includedNamespaces:
+  - demo-app
+  namespaceMapping:
+    demo-app: demo-app-restored
+EOF</pre>
+                </div>
+
+                <h3>Restore Specific Resources Only</h3>
+                <p>Restore only deployments:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl apply -f - <<EOF
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: demo-app-restore-deployments-only
+  namespace: velero
+spec:
+  backupName: $(kubectl get backups -n velero -o jsonpath='{.items[0].metadata.name}')
+  includedNamespaces:
+  - demo-app
+  includedResources:
+  - deployments
+EOF</pre>
+                </div>
+
+                <h3>Restore with Label Selector</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl apply -f - <<EOF
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: demo-app-restore-filtered
+  namespace: velero
+spec:
+  backupName: $(kubectl get backups -n velero -o jsonpath='{.items[0].metadata.name}')
+  labelSelector:
+    matchLabels:
+      app: nginx
+EOF</pre>
+                </div>
+
+                <div class="info-box tip">
+                    <strong>💡 Common Use Cases:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Namespace mapping:</strong> Restore to test/staging</li>
+                        <li><strong>Selective restore:</strong> Only restore specific resources</li>
+                        <li><strong>Label filtering:</strong> Restore only certain applications</li>
+                        <li><strong>Exclude resources:</strong> Skip certain resource types</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 8: Cleanup -->
+            <div class="step">
+                <h2>🧹 Step 8: Cleanup (Optional)</h2>
+                <p>Clean up restore resources to keep your cluster tidy.</p>
+
+                <h3>List All Restores</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl get restores -n velero</pre>
+                </div>
+
+                <h3>Delete Old Restores</h3>
+                <p>Restore resources can be safely deleted after completion:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre>kubectl delete restore -n velero demo-app-restore-20241204-163000</pre>
+                </div>
+
+                <div class="info-box warning">
+                    <strong>⚠️ Note:</strong> Deleting a restore resource does NOT delete the restored application resources. It only removes the restore metadata.
+                </div>
+
+                <h3>Keep Your Cluster Clean</h3>
+                <p>If you want to test the restore again:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre># Delete the restored namespace
+kubectl delete namespace demo-app
+
+# Delete all restore resources
+kubectl delete restores -n velero --all
+
+# You can restore again anytime from your backup!</pre>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="step">
+                <h2>🎉 Congratulations!</h2>
+                <p>You've successfully completed disaster recovery with Velero!</p>
+                
+                <h3>What You Accomplished:</h3>
+                <ul>
+                    <li>✅ Verified existing backup</li>
+                    <li>✅ Simulated a disaster (deleted namespace)</li>
+                    <li>✅ Created a restore operation</li>
+                    <li>✅ Monitored restore progress</li>
+                    <li>✅ Verified all resources restored correctly</li>
+                    <li>✅ Learned advanced restore options</li>
+                </ul>
+
+                <h3>Key Takeaways:</h3>
+                <div class="info-box note">
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Backups are useless without testing restore!</strong> Always test your restore process.</li>
+                        <li><strong>Velero restores everything:</strong> Namespace, resources, configs, secrets.</li>
+                        <li><strong>Flexible restore options:</strong> Restore to different namespaces, filter by labels, selective resources.</li>
+                        <li><strong>Monitor and verify:</strong> Always check restore status and verify restored resources.</li>
+                        <li><strong>Production-ready:</strong> This is how real disaster recovery works.</li>
+                    </ul>
+                </div>
+
+                <h3>Quick Reference Commands:</h3>
+                <div class="code-block">
+                    <pre># List backups
+kubectl get backups -n velero
+
+# Create restore
+velero restore create NAME --from-backup BACKUP_NAME
+
+# Monitor restore
+kubectl get restores -n velero -w
+
+# Describe restore
+kubectl describe restore NAME -n velero
+
+# Verify resources
+kubectl get all -n demo-app</pre>
+                </div>
+
+                <div class="info-box info">
+                    <strong>🎓 Lab Complete!</strong>
+                    You've completed all exercises in the Velero Kubernetes Backup & Restore Hands-On Lab. You now have practical experience with production-ready backup and disaster recovery!
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <a href="../index.html" class="btn btn-primary" style="font-size: 1.1em; padding: 15px 40px;">
+                        ← Back to Lab Home
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Panel -->
+        <div class="terminal-panel">
+            <!-- Terminal Status Bar -->
+            <div class="terminal-header" style="background: #2d3748; color: white; padding: 12px 20px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="terminal-status-dot" style="font-size: 1.5em; animation: pulse 2s infinite;">●</span>
+                    <span id="terminal-status-text" style="font-size: 0.95em;">Checking terminal...</span>
+                </div>
+                <button id="terminal-reconnect-btn" onclick="reconnectTerminal()" style="display: none; background: #667eea; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">Reconnect</button>
+            </div>
+
+            <!-- Embedded Terminal (shown when connected) -->
+            <div id="terminal-embed-container" style="display: none; height: calc(100vh - 60px);">
+                <iframe 
+                    id="terminal-iframe"
+                    src="http://localhost:7681"
+                    style="width: 100%; height: 100%; border: none; background: #1e1e1e;"
+                    title="Interactive Terminal"
+                    allow="clipboard-read; clipboard-write">
+                </iframe>
+            </div>
+
+            <!-- Setup Instructions (shown when NOT connected) -->
+            <div id="terminal-setup-instructions" style="display: block; padding: 30px; background: #1e1e1e; color: #e2e8f0; height: calc(100vh - 60px); overflow-y: auto;">
+                <div style="background: #2d3748; padding: 20px; border-radius: 8px; border-left: 4px solid #fbbf24;">
+                    <h3 style="color: #fbbf24; margin-top: 0;">⚠️ Terminal Not Connected</h3>
+                    <p style="line-height: 1.6;">The interactive terminal is not running. If you completed Exercise 1 setup, just click "Reconnect" above.</p>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h4 style="color: #667eea; font-size: 1.1em;">Quick Setup (if you skipped Exercise 1):</h4>
+                    <div style="background: #0d1117; padding: 15px; border-radius: 6px; margin-top: 10px; border: 1px solid #30363d;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="color: #8b949e; font-size: 0.85em;">Copy and run in your local terminal:</span>
+                            <button onclick="copySetupCommand()" style="background: #238636; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em;">Copy</button>
+                        </div>
+                        <pre id="setup-command" style="color: #c9d1d9; margin: 0; white-space: pre-wrap; word-wrap: break-word;">cd /Users/kondapus/Desktop/glcp/hol/velero-lab && ./start-lab.sh</pre>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; padding: 15px; background: #1c2128; border-radius: 8px; text-align: center; color: #8b949e; font-size: 0.9em;">
+                    <p style="margin: 0;">💡 <strong>Already running?</strong> Click the "Reconnect" button above or refresh this page.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    #terminal-status-dot.connected {
+        color: #48bb78;
+        animation: none;
+    }
+    
+    #terminal-status-dot.disconnected {
+        color: #f56565;
+        animation: none;
+    }
+    
+    #terminal-status-dot.connecting {
+        color: #ed8936;
+        animation: pulse 1s infinite;
+    }
+    </style>
+
+    <script>
+        let terminalCheckInterval;
+        let terminalConnected = false;
+
+        async function checkTerminalServer() {
+            const statusDot = document.getElementById('terminal-status-dot');
+            const statusText = document.getElementById('terminal-status-text');
+            const iframe = document.getElementById('terminal-embed-container');
+            const instructions = document.getElementById('terminal-setup-instructions');
+            const reconnectBtn = document.getElementById('terminal-reconnect-btn');
+            
+            try {
+                const response = await fetch('http://localhost:7681', {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                
+                terminalConnected = true;
+                statusDot.className = 'connected';
+                statusDot.style.color = '#48bb78';
+                statusDot.style.animation = 'none';
+                statusText.textContent = '🟢 Connected - Terminal Ready';
+                iframe.style.display = 'block';
+                instructions.style.display = 'none';
+                reconnectBtn.style.display = 'none';
+                
+                if (terminalCheckInterval) {
+                    clearInterval(terminalCheckInterval);
+                }
+                
+            } catch (error) {
+                terminalConnected = false;
+                statusDot.className = 'disconnected';
+                statusDot.style.color = '#f56565';
+                statusDot.style.animation = 'none';
+                statusText.textContent = '🔴 Not Connected - Setup Required';
+                iframe.style.display = 'none';
+                instructions.style.display = 'block';
+                reconnectBtn.style.display = 'block';
+            }
+        }
+
+        function reconnectTerminal() {
+            const statusDot = document.getElementById('terminal-status-dot');
+            const statusText = document.getElementById('terminal-status-text');
+            
+            statusDot.className = 'connecting';
+            statusText.textContent = '🟠 Connecting...';
+            
+            setTimeout(checkTerminalServer, 1000);
+            terminalCheckInterval = setInterval(checkTerminalServer, 5000);
+        }
+
+        function copySetupCommand() {
+            const command = document.getElementById('setup-command').textContent.trim();
+            const btn = event.target;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(command).then(() => {
+                    showButtonSuccess(btn);
+                }).catch(err => {
+                    fallbackCopySetup(command, btn);
+                });
+            } else {
+                fallbackCopySetup(command, btn);
+            }
+        }
+
+        function fallbackCopySetup(text, btn) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            
+            try {
+                textarea.select();
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showButtonSuccess(btn);
+                } else {
+                    showButtonFailure(btn);
+                }
+            } catch (err) {
+                showButtonFailure(btn);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function showButtonSuccess(btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#238636';
+            }, 2000);
+        }
+
+        function showButtonFailure(btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✗ Failed';
+            btn.style.background = '#dc3545';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#238636';
+            }, 3000);
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.querySelector('pre').textContent.trim();
+            
+            // Method 1: Try modern Clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showCopySuccess(button);
+                }).catch(err => {
+                    console.warn('Clipboard API failed, trying fallback:', err);
+                    fallbackCopy(code, button);
+                });
+            } else {
+                // Method 2: Fallback for older browsers or HTTP
+                fallbackCopy(code, button);
+            }
+        }
+
+        function fallbackCopy(text, button) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '0';
+            document.body.appendChild(textarea);
+            
+            try {
+                textarea.focus();
+                textarea.select();
+                const successful = document.execCommand('copy');
+                
+                if (successful) {
+                    showCopySuccess(button);
+                } else {
+                    showCopyFailure(button);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                showCopyFailure(button);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function showCopySuccess(button) {
+            const originalText = button.textContent;
+            button.textContent = '✓ Copied!';
+            button.style.background = '#28a745';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#667eea';
+            }, 2000);
+        }
+
+        function showCopyFailure(button) {
+            const originalText = button.textContent;
+            button.textContent = '✗ Select & Copy';
+            button.style.background = '#dc3545';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#667eea';
+            }, 3000);
+        }
+
+        // Check on page load
+        checkTerminalServer();
+        terminalCheckInterval = setInterval(checkTerminalServer, 5000);
+        setTimeout(() => {
+            if (terminalCheckInterval && !terminalConnected) {
+                clearInterval(terminalCheckInterval);
+                terminalCheckInterval = setInterval(checkTerminalServer, 30000);
+            }
+        }, 120000);
+    </script>
+</body>
+</html>

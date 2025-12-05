@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: Networking - CKA Prep</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .breadcrumb { padding: 1rem 2rem; background: rgba(13, 31, 45, 0.6); border-bottom: 1px solid rgba(1, 169, 130, 0.1); }
+        .breadcrumb-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #94a3b8; }
+        .breadcrumb a { color: #01a982; text-decoration: none; transition: color 0.2s; }
+        .breadcrumb a:hover { color: #00c896; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .module-header { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 2rem; border-radius: 0.5rem; margin-bottom: 2rem; }
+        .module-header h1 { font-size: 2.5rem; color: #01a982; margin-bottom: 0.5rem; }
+        .module-header p { font-size: 1.1rem; color: #cbd5e1; }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 1.8rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); }
+        h3 { color: #00c896; font-size: 1.4rem; margin: 1.5rem 0 1rem 0; }
+        p { margin-bottom: 1rem; color: #cbd5e1; }
+        ul, ol { margin: 1rem 0 1rem 2rem; color: #cbd5e1; }
+        li { margin-bottom: 0.5rem; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; font-size: 0.9em; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1.5rem; border-radius: 0.5rem; margin: 1.5rem 0; }
+        .info-box h4 { color: #01a982; margin-top: 0; }
+        .btn-nav { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #01a982 0%, #00c896 100%); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s; margin: 0.5rem; }
+        .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(1, 169, 130, 0.3); }
+        .btn-nav.secondary { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(1, 169, 130, 0.3); }
+        .navigation-buttons { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(1, 169, 130, 0.2); }
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(30, 41, 59, 0.3); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid rgba(1, 169, 130, 0.1); }
+        th { background: rgba(1, 169, 130, 0.1); color: #01a982; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#01a982;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00c896;stop-opacity:1" />
+                    </linearGradient></defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="../index.html">🏠 Home</a>
+            <span>›</span>
+            <a href="index.html">Kubernetes Fundamentals</a>
+            <span>›</span>
+            <span>Module 3: Networking</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="module-header">
+            <h1>Module 3: Networking</h1>
+            <p>Master Kubernetes networking: Services, Ingress, Network Policies, and DNS.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>🌐 Service Types</h2>
+            
+            <h3>ClusterIP (Default)</h3>
+            <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+  ports:
+  - port: 80
+    targetPort: 8080
+
+# Create imperatively
+kubectl expose deployment myapp --port=80 --target-port=8080</code></pre>
+
+            <h3>NodePort</h3>
+            <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: my-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: myapp
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30080  # 30000-32767
+
+kubectl expose deployment myapp --type=NodePort --port=80</code></pre>
+
+            <h3>LoadBalancer</h3>
+            <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: my-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: myapp
+  ports:
+  - port: 80
+    targetPort: 8080</code></pre>
+
+            <h3>Headless Service (StatefulSet)</h3>
+            <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-headless
+spec:
+  clusterIP: None
+  selector:
+    app: nginx
+  ports:
+  - port: 80</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🚪 Ingress</h2>
+            <p>HTTP(S) routing to services based on hostnames and paths.</p>
+
+            <pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: myapp.example.com
+    http:
+      paths:
+      - path: /app
+        pathType: Prefix
+        backend:
+          service:
+            name: app-service
+            port:
+              number: 80
+  - host: api.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 8080
+  tls:
+  - hosts:
+    - myapp.example.com
+    secretName: tls-secret</code></pre>
+
+            <pre><code># Install nginx ingress controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+
+# Check ingress
+kubectl get ingress
+kubectl describe ingress my-ingress</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔒 Network Policies</h2>
+            <p>Control traffic flow between pods.</p>
+
+            <h3>Deny All Ingress</h3>
+            <pre><code>apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress</code></pre>
+
+            <h3>Allow Specific Traffic</h3>
+            <pre><code>apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 8080</code></pre>
+
+            <h3>Allow from Namespace</h3>
+            <pre><code>apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          environment: production
+    ports:
+    - protocol: TCP
+      port: 443</code></pre>
+
+            <div class="info-box">
+                <h4>📌 CKA Tip</h4>
+                <p>NetworkPolicies require a CNI that supports them (Calico, Cilium, Weave). Default deny-all is common security practice.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🔍 DNS & Service Discovery</h2>
+            
+            <pre><code># Service DNS format
+<service-name>.<namespace>.svc.cluster.local
+
+# Examples
+nginx.default.svc.cluster.local
+api-service.production.svc.cluster.local
+
+# Within same namespace, short name works
+curl http://nginx
+
+# Different namespace
+curl http://nginx.production
+
+# Pod DNS (for StatefulSets)
+<pod-name>.<service-name>.<namespace>.svc.cluster.local
+web-0.nginx.default.svc.cluster.local
+
+# Test DNS resolution
+kubectl run -it --rm debug --image=busybox --restart=Never -- nslookup nginx
+
+# Check CoreDNS
+kubectl get pods -n kube-system -l k8s-app=kube-dns
+kubectl logs -n kube-system -l k8s-app=kube-dns</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ Networking Commands</h2>
+            
+            <pre><code># Service operations
+kubectl get svc
+kubectl describe svc my-service
+kubectl get endpoints my-service
+
+# Check pod connectivity
+kubectl exec -it pod1 -- ping pod2-ip
+kubectl exec -it pod1 -- curl http://service-name
+
+# Port forwarding
+kubectl port-forward svc/my-service 8080:80
+kubectl port-forward pod/nginx 8080:80
+
+# Network troubleshooting pod
+kubectl run netshoot --rm -it --image=nicolaka/netshoot -- /bin/bash
+
+# Inside netshoot:
+# - ping, curl, dig, nslookup, tcpdump, netstat
+
+# Check iptables rules (on node)
+iptables -t nat -L -n -v | grep my-service
+
+# CNI troubleshooting
+ls /etc/cni/net.d/
+cat /etc/cni/net.d/10-calico.conflist</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Module 3 Key Points</h2>
+            <ul>
+                <li>✅ ClusterIP: Internal cluster communication (default)</li>
+                <li>✅ NodePort: External access via node:port (30000-32767)</li>
+                <li>✅ LoadBalancer: Cloud load balancer integration</li>
+                <li>✅ Ingress: L7 routing, hostname/path-based</li>
+                <li>✅ NetworkPolicies: Pod traffic control (firewall rules)</li>
+                <li>✅ DNS: service-name.namespace.svc.cluster.local</li>
+                <li>✅ CoreDNS: Cluster DNS server</li>
+                <li>✅ Endpoints: Track pod IPs behind services</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="module2-workloads.html" class="btn-nav secondary">← Module 2: Workloads</a>
+            <a href="module4-storage.html" class="btn-nav">Next: Storage →</a>
+        </div>
+    </div>
+</body>
+</html>

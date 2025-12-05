@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Module 5: Security & RBAC - CKA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .breadcrumb { padding: 1rem 2rem; background: rgba(13, 31, 45, 0.6); }
+        .breadcrumb-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #94a3b8; }
+        .breadcrumb a { color: #01a982; text-decoration: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .module-header { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 2rem; border-radius: 0.5rem; margin-bottom: 2rem; }
+        .module-header h1 { font-size: 2.5rem; color: #01a982; margin-bottom: 0.5rem; }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 1.8rem; margin-bottom: 1rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); padding-bottom: 0.5rem; }
+        h3 { color: #00c896; font-size: 1.4rem; margin: 1.5rem 0 1rem 0; }
+        p, li { color: #cbd5e1; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1.5rem; border-radius: 0.5rem; margin: 1.5rem 0; }
+        .btn-nav { display: inline-flex; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #01a982, #00c896); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; }
+        .btn-nav.secondary { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(1, 169, 130, 0.3); }
+        .navigation-buttons { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(1, 169, 130, 0.2); }
+        ul { margin: 1rem 0 1rem 2rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#01a982" /><stop offset="100%" style="stop-color:#00c896" />
+                    </linearGradient></defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb"><div class="breadcrumb-content">
+        <a href="../index.html">🏠 Home</a><span>›</span>
+        <a href="index.html">Kubernetes Fundamentals</a><span>›</span>
+        <span>Module 5: Security</span>
+    </div></div>
+
+    <div class="container">
+        <div class="module-header">
+            <h1>Module 5: Security & RBAC</h1>
+            <p>Authentication, Authorization, RBAC, Security Contexts, and Pod Security.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>🔐 RBAC (Role-Based Access Control)</h2>
+            
+            <h3>Role (Namespace-scoped)</h3>
+            <pre><code>apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]</code></pre>
+
+            <h3>RoleBinding</h3>
+            <pre><code>apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: jane
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io</code></pre>
+
+            <h3>ClusterRole (Cluster-wide)</h3>
+            <pre><code>apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: secret-reader
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "watch", "list"]</code></pre>
+
+            <h3>ClusterRoleBinding</h3>
+            <pre><code>apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: read-secrets-global
+subjects:
+- kind: Group
+  name: manager
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: secret-reader
+  apiGroup: rbac.authorization.k8s.io</code></pre>
+
+            <pre><code># Create role imperatively
+kubectl create role pod-reader --verb=get --verb=list --resource=pods
+
+# Create rolebinding
+kubectl create rolebinding read-pods --role=pod-reader --user=jane
+
+# Create clusterrole
+kubectl create clusterrole deployment-admin --verb=* --resource=deployments
+
+# Check permissions
+kubectl auth can-i create deployments --as=jane
+kubectl auth can-i get pods --namespace=dev --as=jane
+
+# View roles
+kubectl get roles
+kubectl get clusterroles
+kubectl describe role pod-reader</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>👤 ServiceAccounts</h2>
+            
+            <pre><code># Create service account
+kubectl create serviceaccount my-sa
+
+# YAML
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-sa
+  namespace: default
+
+# Use in pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  serviceAccountName: my-sa
+  containers:
+  - name: app
+    image: myapp:1.0
+
+# Bind role to service account
+kubectl create rolebinding sa-admin \
+  --role=admin \
+  --serviceaccount=default:my-sa
+
+# Get SA token (for external access)
+kubectl create token my-sa
+
+# View SA
+kubectl get sa
+kubectl describe sa my-sa</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛡️ Security Contexts</h2>
+            
+            <h3>Pod-level Security Context</h3>
+            <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: security-context-demo
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    supplementalGroups: [4000]
+  containers:
+  - name: sec-ctx-demo
+    image: busybox
+    command: ["sh", "-c", "sleep 1h"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - NET_BIND_SERVICE
+      readOnlyRootFilesystem: true</code></pre>
+
+            <div class="info-box">
+                <h4>Security Best Practices</h4>
+                <ul>
+                    <li>Always run as non-root user</li>
+                    <li>Drop all capabilities, add only needed ones</li>
+                    <li>Use readOnlyRootFilesystem when possible</li>
+                    <li>Disable privilegeEscalation</li>
+                    <li>Set fsGroup for volume permissions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🔒 Pod Security Standards</h2>
+            
+            <pre><code># Namespace labels for Pod Security Admission
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-namespace
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+
+# Three levels:
+# - privileged: Unrestricted
+# - baseline: Minimally restrictive
+# - restricted: Heavily restricted (production recommended)</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔑 Certificate Management</h2>
+            
+            <pre><code># Create certificate signing request
+openssl genrsa -out jane.key 2048
+openssl req -new -key jane.key -out jane.csr -subj "/CN=jane/O=devs"
+
+# Create CSR in Kubernetes
+cat <<EOF | kubectl apply -f -
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: jane
+spec:
+  request: $(cat jane.csr | base64 | tr -d '\n')
+  signerName: kubernetes.io/kube-apiserver-client
+  usages:
+  - client auth
+EOF
+
+# Approve CSR
+kubectl certificate approve jane
+
+# Get certificate
+kubectl get csr jane -o jsonpath='{.status.certificate}' | base64 -d > jane.crt
+
+# Create kubeconfig
+kubectl config set-credentials jane --client-certificate=jane.crt --client-key=jane.key
+kubectl config set-context jane-context --cluster=kubernetes --user=jane</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ Security Commands</h2>
+            
+            <pre><code># RBAC operations
+kubectl get roles,rolebindings
+kubectl get clusterroles,clusterrolebindings
+kubectl describe role pod-reader
+kubectl auth can-i list pods --as=jane
+
+# Service accounts
+kubectl get sa
+kubectl create sa app-sa
+kubectl create token app-sa --duration=24h
+
+# Check effective permissions
+kubectl auth can-i --list --as=jane
+
+# View certificates
+kubectl get csr
+kubectl certificate approve/deny [name]
+
+# Security auditing
+kubectl get pods --all-namespaces -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.securityContext.runAsUser}{"\n"}{end}'</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Module 5 Key Points</h2>
+            <ul>
+                <li>✅ RBAC: Role + RoleBinding (namespace), ClusterRole + ClusterRoleBinding (cluster)</li>
+                <li>✅ ServiceAccount: Identity for pods</li>
+                <li>✅ Security Context: Run as non-root, drop capabilities, readOnlyRootFilesystem</li>
+                <li>✅ Pod Security Standards: privileged, baseline, restricted</li>
+                <li>✅ Certificates: CSR approval for user authentication</li>
+                <li>✅ Verbs: get, list, watch, create, update, patch, delete</li>
+                <li>✅ <code>kubectl auth can-i</code>: Check permissions</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="module4-storage.html" class="btn-nav secondary">← Module 4: Storage</a>
+            <a href="module6-scheduling.html" class="btn-nav">Next: Scheduling →</a>
+        </div>
+    </div>
+</body>
+</html>

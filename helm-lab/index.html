@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helm Package Manager - Hands-On Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; min-height: 100vh; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .breadcrumb { padding: 1rem 2rem; background: rgba(13, 31, 45, 0.6); }
+        .breadcrumb-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #94a3b8; }
+        .breadcrumb a { color: #01a982; text-decoration: none; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .hero { text-align: center; padding: 3rem 2rem; background: rgba(1, 169, 130, 0.05); border-radius: 1rem; margin-bottom: 3rem; }
+        .hero h1 { font-size: 2.5rem; font-weight: 700; color: #01a982; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; color: #cbd5e1; max-width: 800px; margin: 0 auto; }
+        .badge { display: inline-block; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; margin: 1rem 0.25rem 0; background: rgba(1, 169, 130, 0.2); color: #01a982; border: 1px solid rgba(1, 169, 130, 0.4); }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); }
+        h3 { color: #00c896; font-size: 1.5rem; margin: 1.5rem 0 1rem; }
+        p { margin-bottom: 1rem; color: #cbd5e1; }
+        ul, ol { margin: 1rem 0 1rem 2rem; color: #cbd5e1; }
+        li { margin-bottom: 0.5rem; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; font-size: 0.9em; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1.5rem; border-radius: 0.5rem; margin: 1.5rem 0; }
+        .info-box h4 { color: #01a982; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 2L4 10v12c0 10 7 19 16 22 9-3 16-12 16-22V10L20 2z" fill="url(#grad1)"/>
+                    <path d="M20 8L10 13v8c0 6 4 11 10 13 6-2 10-7 10-13v-8L20 8z" fill="#0d1f2d"/>
+                    <path d="M15 20l3 3 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#01a982" /><stop offset="100%" style="stop-color:#00c896" />
+                    </linearGradient></defs>
+                </svg>
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="../index.html">🏠 Home</a>
+            <span>›</span>
+            <span>Helm Package Manager</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>⎈ Helm Package Manager</h1>
+            <p>Package, deploy, and manage Kubernetes applications efficiently using Helm charts. The package manager for Kubernetes.</p>
+            <div>
+                <span class="badge">Package Management</span>
+                <span class="badge">Templating</span>
+                <span class="badge">Production Ready</span>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 What is Helm?</h2>
+            <p>Helm is the package manager for Kubernetes, like apt/yum for Linux or npm for Node.js. It helps you define, install, and upgrade complex Kubernetes applications.</p>
+            
+            <h3>Key Concepts</h3>
+            <ul>
+                <li><strong>Chart:</strong> A Helm package containing Kubernetes templates</li>
+                <li><strong>Release:</strong> An instance of a chart running in a cluster</li>
+                <li><strong>Repository:</strong> A place where charts are stored and shared</li>
+                <li><strong>Values:</strong> Configuration parameters for customizing charts</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>📦 Installing Helm</h2>
+            <pre><code># macOS
+brew install helm
+
+# Linux (script)
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Windows (Chocolatey)
+choco install kubernetes-helm
+
+# Verify installation
+helm version</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🚀 Using Helm Charts</h2>
+            
+            <h3>Search and Install Charts</h3>
+            <pre><code># Add official Helm stable repository
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+# Search for charts
+helm search repo nginx
+helm search hub wordpress
+
+# Install a chart
+helm install my-nginx bitnami/nginx
+
+# Install with custom values
+helm install my-nginx bitnami/nginx --set replicaCount=3
+
+# Install with values file
+helm install my-nginx bitnami/nginx -f values.yaml
+
+# Install in specific namespace
+helm install my-nginx bitnami/nginx --namespace web --create-namespace
+
+# Dry run (see what would be installed)
+helm install my-nginx bitnami/nginx --dry-run --debug</code></pre>
+
+            <h3>Managing Releases</h3>
+            <pre><code># List installed releases
+helm list
+helm list --all-namespaces
+
+# Get release status
+helm status my-nginx
+
+# View release values
+helm get values my-nginx
+helm get manifest my-nginx
+
+# Upgrade release
+helm upgrade my-nginx bitnami/nginx --set replicaCount=5
+
+# Rollback release
+helm rollback my-nginx
+helm rollback my-nginx 1  # rollback to revision 1
+
+# Uninstall release
+helm uninstall my-nginx
+helm uninstall my-nginx --keep-history
+
+# View release history
+helm history my-nginx</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📝 Creating Your Own Chart</h2>
+            
+            <h3>Step 1: Create Chart Scaffold</h3>
+            <pre><code># Create new chart
+helm create myapp
+
+# Chart structure:
+myapp/
+├── Chart.yaml          # Chart metadata
+├── values.yaml         # Default configuration values
+├── charts/             # Chart dependencies
+└── templates/          # Kubernetes manifest templates
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── ingress.yaml
+    ├── _helpers.tpl    # Template helpers
+    └── NOTES.txt       # Installation notes</code></pre>
+
+            <h3>Step 2: Edit Chart.yaml</h3>
+            <pre><code>apiVersion: v2
+name: myapp
+description: A Helm chart for my application
+type: application
+version: 1.0.0        # Chart version
+appVersion: "1.0.0"   # App version
+maintainers:
+  - name: Your Name
+    email: you@example.com
+keywords:
+  - web
+  - application
+home: https://github.com/myorg/myapp
+sources:
+  - https://github.com/myorg/myapp</code></pre>
+
+            <h3>Step 3: Define Values</h3>
+            <pre><code># values.yaml
+replicaCount: 2
+
+image:
+  repository: myapp
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: myapp.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80</code></pre>
+
+            <h3>Step 4: Template Deployment</h3>
+            <pre><code># templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "myapp.fullname" . }}
+  labels:
+    {{- include "myapp.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "myapp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "myapp.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}</code></pre>
+
+            <h3>Step 5: Test and Package</h3>
+            <pre><code># Lint chart
+helm lint myapp/
+
+# Template (render templates locally)
+helm template myapp myapp/
+
+# Package chart
+helm package myapp/
+
+# Install your chart
+helm install my-release ./myapp
+
+# Or from packaged file
+helm install my-release myapp-1.0.0.tgz</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔧 Advanced Helm Features</h2>
+            
+            <h3>Chart Dependencies</h3>
+            <pre><code># Chart.yaml
+dependencies:
+  - name: postgresql
+    version: 12.1.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: 17.3.7
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+
+# Update dependencies
+helm dependency update myapp/
+
+# List dependencies
+helm dependency list myapp/</code></pre>
+
+            <h3>Template Functions</h3>
+            <pre><code># Common template functions
+{{ .Release.Name }}              # Release name
+{{ .Release.Namespace }}         # Namespace
+{{ .Chart.Name }}                # Chart name
+{{ .Chart.Version }}             # Chart version
+{{ .Values.replicaCount }}       # Access values
+
+# String functions
+{{ upper "hello" }}              # HELLO
+{{ lower "HELLO" }}              # hello
+{{ quote .Values.name }}         # "value"
+{{ default "default" .Values.optional }}  # Default value
+
+# Logic
+{{- if .Values.ingress.enabled }}
+  # content
+{{- end }}
+
+{{- range .Values.items }}
+  - {{ . }}
+{{- end }}
+
+# Include template
+{{- include "myapp.labels" . | nindent 4 }}</code></pre>
+
+            <h3>Hooks</h3>
+            <pre><code># Pre-install hook
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "myapp.fullname" . }}-migration
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: migrate:latest
+        command: ["migrate", "up"]
+      restartPolicy: Never
+
+# Hook annotations:
+# - pre-install, post-install
+# - pre-upgrade, post-upgrade
+# - pre-delete, post-delete
+# - pre-rollback, post-rollback</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🎨 Environment-Specific Values</h2>
+            
+            <pre><code># values-dev.yaml
+replicaCount: 1
+ingress:
+  hosts:
+    - host: dev.myapp.com
+
+# values-prod.yaml
+replicaCount: 5
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+ingress:
+  hosts:
+    - host: myapp.com
+
+# Install with environment-specific values
+helm install myapp ./myapp -f values-dev.yaml
+helm install myapp ./myapp -f values-prod.yaml
+
+# Override multiple values
+helm install myapp ./myapp \
+  -f values-prod.yaml \
+  --set replicaCount=10 \
+  --set image.tag=v2.0.0</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ Helm Commands Cheatsheet</h2>
+            
+            <pre><code># Repository management
+helm repo add [name] [url]
+helm repo list
+helm repo update
+helm repo remove [name]
+
+# Search
+helm search repo [keyword]
+helm search hub [keyword]
+
+# Install/Upgrade/Rollback
+helm install [release] [chart]
+helm upgrade [release] [chart]
+helm upgrade --install [release] [chart]  # Install if not exists
+helm rollback [release] [revision]
+
+# List and inspect
+helm list
+helm status [release]
+helm get values [release]
+helm get manifest [release]
+helm history [release]
+
+# Uninstall
+helm uninstall [release]
+
+# Chart development
+helm create [name]
+helm lint [chart]
+helm template [release] [chart]
+helm package [chart]
+helm dependency update [chart]
+
+# Testing
+helm test [release]
+
+# Plugin management
+helm plugin install [url]
+helm plugin list</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Best Practices</h2>
+            <ul>
+                <li>✅ Use semantic versioning for charts</li>
+                <li>✅ Document values in values.yaml with comments</li>
+                <li>✅ Use template helpers (_helpers.tpl) for repeated logic</li>
+                <li>✅ Set resource limits and requests</li>
+                <li>✅ Use helm lint before packaging</li>
+                <li>✅ Test charts with helm test</li>
+                <li>✅ Version your Chart.yaml properly</li>
+                <li>✅ Use .helmignore to exclude unnecessary files</li>
+                <li>✅ Separate environment configs with different values files</li>
+                <li>✅ Use hooks for database migrations and pre/post tasks</li>
+                <li>✅ Keep charts simple and modular</li>
+                <li>✅ Use chart dependencies instead of copying templates</li>
+            </ul>
+
+            <div class="info-box">
+                <h4>💡 Pro Tip</h4>
+                <p>Always use <code>helm upgrade --install</code> in CI/CD pipelines. This command will install the release if it doesn't exist, or upgrade it if it does, making your deployment scripts idempotent.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

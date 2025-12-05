@@ -4,7 +4,38 @@ Welcome! This repository contains hands-on lab exercises for HPE SilverCreek pla
 
 ## 📋 Prerequisites
 
-You need **Python 3** installed on your system to run the local web server.
+## 📖 Blog & Documentation
+
+### Blog Posts
+
+📄 **[Building Interactive Hands-On Labs for HPE SilverCreek](./blog/building-interactive-labs.md)**
+
+Topics covered:
+- Dual-environment architecture design
+- Overcoming iframe security challenges
+- Creating realistic simulations
+- Best practices for offline training materials
+
+📄 **[Hands-On Guide: Installing and Configuring Velero for Kubernetes](./blog/velero-hands-on-guide.md)** ⭐ NEW
+
+A complete step-by-step tutorial with real commands and sample outputs:
+- Install Velero using Helm with production configuration
+- Configure S3-compatible storage (MinIO)
+- Create and restore backups
+- Multi-phase restore workflows
+- Troubleshooting guide
+- **Perfect foundation for creating a future Velero HOL!**
+
+### White Paper
+
+📄 **[Velero-Based Backup and Restore for Kubernetes Clusters: Why VMware Snapshots Fall Short](./whitepaper/velero-kubernetes-backup-whitepaper.md)**
+
+Topics covered:
+- Why VMware snapshots fail for Kubernetes with 900+ services
+- Velero architecture and advantages
+- Four-phase restore workflow for complex dependencies
+- Production implementation analysis with code walkthrough
+- Best practices for backup strategy and disaster recoveryPython 3** installed on your system to run the local web server.
 
 ### Installing Python 3
 
@@ -140,7 +171,19 @@ python3 -m http.server 8080
 - **Simulated Lab**: See `simulated-lab/README.md`
 - **Real Lab**: See `real-lab/README.md`
 
-## 💡 Quick Tips
+## � Blog & Documentation
+
+Want to learn about how this project was built? Check out our blog post:
+
+📄 **[Building Interactive Hands-On Labs for HPE SilverCreek](./blog/building-interactive-labs.md)**
+
+Topics covered:
+- Dual-environment architecture design
+- Overcoming iframe security challenges
+- Creating realistic simulations
+- Best practices for offline training materials
+
+## �💡 Quick Tips
 
 - Start with the **Simulated Lab** if you're new
 - The simulated environment is perfect for demos and training

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prometheus & Grafana Monitoring - Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; min-height: 100vh; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .hero { text-align: center; padding: 3rem 2rem; background: rgba(1, 169, 130, 0.05); border-radius: 1rem; margin-bottom: 3rem; }
+        .hero h1 { font-size: 2.5rem; color: #01a982; margin-bottom: 1rem; }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 2rem; margin-bottom: 1rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); padding-bottom: 0.5rem; }
+        h3 { color: #00c896; font-size: 1.5rem; margin: 1.5rem 0 1rem; }
+        p, li { color: #cbd5e1; }
+        ul { margin: 1rem 0 1rem 2rem; }
+        li { margin-bottom: 0.5rem; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+        .info-box { background: rgba(1, 169, 130, 0.1); border-left: 4px solid #01a982; padding: 1rem; margin: 1rem 0; border-radius: 0.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>📊 Prometheus & Grafana Monitoring</h1>
+            <p>Complete monitoring stack for Kubernetes clusters with metrics, visualization, and alerting.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>📦 Installing Prometheus Stack</h2>
+            <pre><code># Add Helm repo
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+# Install kube-prometheus-stack (Prometheus + Grafana + Alertmanager)
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace \
+  --set prometheus.prometheusSpec.retention=30d \
+  --set grafana.adminPassword=admin
+
+# Verify
+kubectl get pods -n monitoring
+kubectl get svc -n monitoring</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔍 Accessing Dashboards</h2>
+            
+            <h3>Prometheus UI</h3>
+            <pre><code># Port forward
+kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090
+
+# Access: http://localhost:9090</code></pre>
+
+            <h3>Grafana</h3>
+            <pre><code># Port forward
+kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
+
+# Access: http://localhost:3000
+# Username: admin
+# Password: admin (or what you set)</code></pre>
+
+            <h3>Alertmanager</h3>
+            <pre><code># Port forward
+kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-alertmanager 9093:9093
+
+# Access: http://localhost:9093</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📈 PromQL Basics</h2>
+            
+            <h3>Instant Queries</h3>
+            <pre><code># CPU usage
+rate(container_cpu_usage_seconds_total[5m])
+
+# Memory usage
+container_memory_working_set_bytes
+
+# Pod restarts
+kube_pod_container_status_restarts_total
+
+# HTTP requests per second
+rate(http_requests_total[5m])
+
+# Error rate
+sum(rate(http_requests_total{status=~"5.."}[5m]))
+
+# 95th percentile latency
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))</code></pre>
+
+            <h3>Aggregations</h3>
+            <pre><code># Sum by namespace
+sum by (namespace) (container_memory_working_set_bytes)
+
+# Average CPU
+avg(rate(container_cpu_usage_seconds_total[5m])) by (pod)
+
+# Top 5 pods by memory
+topk(5, container_memory_working_set_bytes)
+
+# Count running pods
+count(kube_pod_status_phase{phase="Running"})</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 Creating Grafana Dashboards</h2>
+            
+            <h3>Pre-built Dashboards</h3>
+            <div class="info-box">
+                <p><strong>Import popular dashboards from grafana.com:</strong></p>
+                <ul>
+                    <li><code>315</code> - Kubernetes cluster monitoring</li>
+                    <li><code>6417</code> - Kubernetes cluster</li>
+                    <li><code>7249</code> - Kubernetes cluster (Prometheus)</li>
+                    <li><code>1860</code> - Node exporter full</li>
+                </ul>
+            </div>
+
+            <h3>Import Dashboard</h3>
+            <pre><code>1. Go to Grafana UI
+2. Click + (plus) > Import
+3. Enter dashboard ID (e.g., 315)
+4. Select Prometheus data source
+5. Click Import</code></pre>
+
+            <h3>Custom Dashboard JSON</h3>
+            <pre><code>{
+  "dashboard": {
+    "title": "Pod Monitoring",
+    "panels": [
+      {
+        "title": "Pod CPU Usage",
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"$pod\"}[5m])) by (pod)"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Pod Memory Usage",
+        "targets": [
+          {
+            "expr": "sum(container_memory_working_set_bytes{pod=~\"$pod\"}) by (pod)"
+          }
+        ],
+        "type": "graph"
+      }
+    ]
+  }
+}</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🚨 Alerting with Alertmanager</h2>
+            
+            <h3>PrometheusRule Example</h3>
+            <pre><code>apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: app-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: app-rules
+    interval: 30s
+    rules:
+    - alert: HighPodMemory
+      expr: |
+        sum(container_memory_working_set_bytes{pod=~"myapp-.*"}) 
+        by (pod) > 500000000
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Pod {{ $labels.pod }} high memory"
+        description: "Memory usage is {{ $value }} bytes"
+    
+    - alert: PodCrashLooping
+      expr: |
+        rate(kube_pod_container_status_restarts_total[15m]) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Pod {{ $labels.pod }} crash looping"</code></pre>
+
+            <h3>Alertmanager Config</h3>
+            <pre><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+stringData:
+  alertmanager.yaml: |
+    global:
+      resolve_timeout: 5m
+    
+    route:
+      group_by: ['alertname', 'cluster']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 12h
+      receiver: 'slack'
+    
+    receivers:
+    - name: 'slack'
+      slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+        channel: '#alerts'
+        title: '{{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📏 Custom Metrics</h2>
+            
+            <h3>ServiceMonitor</h3>
+            <pre><code>apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: myapp
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics</code></pre>
+
+            <h3>Application Metrics (Python)</h3>
+            <pre><code>from prometheus_client import Counter, Histogram, start_http_server
+
+# Define metrics
+REQUEST_COUNT = Counter('http_requests_total', 'Total requests')
+REQUEST_LATENCY = Histogram('http_request_duration_seconds', 'Request latency')
+
+# Instrument code
+@REQUEST_LATENCY.time()
+def process_request():
+    REQUEST_COUNT.inc()
+    # Your code here
+
+# Start metrics server
+start_http_server(8000)  # /metrics endpoint</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ Prometheus Commands</h2>
+            <pre><code># Check Prometheus targets
+curl http://localhost:9090/api/v1/targets
+
+# Query API
+curl 'http://localhost:9090/api/v1/query?query=up'
+
+# Query with time range
+curl 'http://localhost:9090/api/v1/query_range?query=rate(http_requests_total[5m])&start=2024-01-01T00:00:00Z&end=2024-01-01T01:00:00Z&step=15s'
+
+# Check configuration
+curl http://localhost:9090/api/v1/status/config
+
+# Reload config
+curl -X POST http://localhost:9090/-/reload
+
+# Check rules
+curl http://localhost:9090/api/v1/rules
+
+# List labels
+curl http://localhost:9090/api/v1/labels</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 Key Metrics to Monitor</h2>
+            
+            <h3>Cluster Level</h3>
+            <ul>
+                <li><code>kube_node_status_condition</code> - Node health</li>
+                <li><code>kube_node_status_capacity</code> - Node capacity</li>
+                <li><code>kube_node_status_allocatable</code> - Allocatable resources</li>
+            </ul>
+
+            <h3>Pod Level</h3>
+            <ul>
+                <li><code>kube_pod_status_phase</code> - Pod status</li>
+                <li><code>kube_pod_container_status_restarts_total</code> - Restarts</li>
+                <li><code>container_cpu_usage_seconds_total</code> - CPU usage</li>
+                <li><code>container_memory_working_set_bytes</code> - Memory usage</li>
+            </ul>
+
+            <h3>Application Level</h3>
+            <ul>
+                <li><code>http_requests_total</code> - Request count</li>
+                <li><code>http_request_duration_seconds</code> - Latency</li>
+                <li><code>http_requests_errors_total</code> - Error count</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Best Practices</h2>
+            <ul>
+                <li>✅ Set appropriate retention periods (30d default)</li>
+                <li>✅ Use recording rules for expensive queries</li>
+                <li>✅ Label metrics consistently (app, environment, version)</li>
+                <li>✅ Monitor monitoring: Prometheus itself should be monitored</li>
+                <li>✅ Use histogram for latency, counter for totals</li>
+                <li>✅ Alert on symptoms, not causes</li>
+                <li>✅ Test alerts in staging before production</li>
+                <li>✅ Use dashboard variables for flexibility</li>
+                <li>✅ Export and version control dashboards</li>
+                <li>✅ Set resource limits on Prometheus pods</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>🎯 Key Takeaways</h2>
+            <ul>
+                <li>✅ Prometheus: Pull-based metrics collection</li>
+                <li>✅ Grafana: Visualization and dashboards</li>
+                <li>✅ Alertmanager: Alert routing and silencing</li>
+                <li>✅ PromQL: Query language for metrics</li>
+                <li>✅ ServiceMonitor: Automatic target discovery</li>
+                <li>✅ PrometheusRule: Define alerting rules</li>
+                <li>✅ Exporters: Collect metrics from third-party systems</li>
+                <li>✅ Time series data: Metric name + labels + timestamp + value</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

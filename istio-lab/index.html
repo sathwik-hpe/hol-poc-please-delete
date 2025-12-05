@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Service Mesh with Istio - Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%); color: #e2e8f0; line-height: 1.7; min-height: 100vh; }
+        .navbar { background: rgba(13, 31, 45, 0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; border-bottom: 1px solid rgba(1, 169, 130, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 600; color: #01a982; text-decoration: none; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .hero { text-align: center; padding: 3rem 2rem; background: rgba(1, 169, 130, 0.05); border-radius: 1rem; margin-bottom: 3rem; }
+        .hero h1 { font-size: 2.5rem; color: #01a982; margin-bottom: 1rem; }
+        .content-section { background: rgba(30, 41, 59, 0.5); padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid rgba(1, 169, 130, 0.1); }
+        h2 { color: #01a982; font-size: 2rem; margin-bottom: 1rem; border-bottom: 2px solid rgba(1, 169, 130, 0.3); padding-bottom: 0.5rem; }
+        h3 { color: #00c896; font-size: 1.5rem; margin: 1.5rem 0 1rem; }
+        p, li { color: #cbd5e1; }
+        ul { margin: 1rem 0 1rem 2rem; }
+        li { margin-bottom: 0.5rem; }
+        code { background: rgba(1, 169, 130, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; color: #00c896; }
+        pre { background: #1e293b; padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(1, 169, 130, 0.2); }
+        pre code { background: none; padding: 0; color: #e2e8f0; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <span>HPE Labs Hub</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>🕸️ Service Mesh with Istio</h1>
+            <p>Implement service mesh for microservices with traffic management, security, and observability.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>📦 Installing Istio</h2>
+            <pre><code># Download Istio
+curl -L https://istio.io/downloadIstio | sh -
+cd istio-1.20.0
+export PATH=$PWD/bin:$PATH
+
+# Install with demo profile
+istioctl install --set profile=demo -y
+
+# Enable sidecar injection
+kubectl label namespace default istio-injection=enabled
+
+# Verify
+kubectl get pods -n istio-system</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🚀 Deploy Sample App</h2>
+            <pre><code># Deploy Bookinfo sample
+kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+
+# Expose via gateway
+kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
+
+# Get ingress IP
+kubectl get svc istio-ingressgateway -n istio-system
+
+# Access: http://EXTERNAL-IP/productpage</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>⚖️ Traffic Management</h2>
+            
+            <h3>Virtual Service</h3>
+            <pre><code>apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews
+spec:
+  hosts:
+  - reviews
+  http:
+  - match:
+    - headers:
+        end-user:
+          exact: jason
+    route:
+    - destination:
+        host: reviews
+        subset: v2
+  - route:
+    - destination:
+        host: reviews
+        subset: v1</code></pre>
+
+            <h3>Destination Rule</h3>
+            <pre><code>apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: reviews
+spec:
+  host: reviews
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+  - name: v3
+    labels:
+      version: v3</code></pre>
+
+            <h3>Canary Deployment</h3>
+            <pre><code>apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-canary
+spec:
+  hosts:
+  - reviews
+  http:
+  - route:
+    - destination:
+        host: reviews
+        subset: v1
+      weight: 90
+    - destination:
+        host: reviews
+        subset: v2
+      weight: 10  # 10% traffic to v2</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🔒 Security</h2>
+            
+            <h3>mTLS</h3>
+            <pre><code>apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: default
+spec:
+  mtls:
+    mode: STRICT
+
+# Verify mTLS
+istioctl authn tls-check [pod-name]</code></pre>
+
+            <h3>Authorization Policy</h3>
+            <pre><code>apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-read
+spec:
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/frontend"]
+    to:
+    - operation:
+        methods: ["GET"]</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 Observability</h2>
+            
+            <h3>Install Add-ons</h3>
+            <pre><code># Prometheus, Grafana, Kiali, Jaeger
+kubectl apply -f samples/addons/
+
+# Access Kiali dashboard
+istioctl dashboard kiali
+
+# Access Grafana
+istioctl dashboard grafana
+
+# Access Jaeger
+istioctl dashboard jaeger
+
+# Prometheus
+istioctl dashboard prometheus</code></pre>
+
+            <h3>Metrics</h3>
+            <pre><code># Request metrics
+istio_requests_total
+istio_request_duration_milliseconds
+istio_request_bytes
+istio_response_bytes
+
+# Generate traffic
+for i in {1..100}; do
+  curl http://$GATEWAY_URL/productpage
+done</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>🛠️ Istio Commands</h2>
+            <pre><code># Install/Upgrade
+istioctl install --set profile=demo
+istioctl upgrade
+
+# Verify installation
+istioctl verify-install
+
+# Analyze configuration
+istioctl analyze
+
+# Proxy status
+istioctl proxy-status
+
+# View config
+istioctl proxy-config routes [pod]
+istioctl proxy-config clusters [pod]
+istioctl proxy-config endpoints [pod]
+
+# Debugging
+kubectl logs [pod] -c istio-proxy
+istioctl dashboard envoy [pod]</code></pre>
+        </div>
+
+        <div class="content-section">
+            <h2>✅ Key Takeaways</h2>
+            <ul>
+                <li>✅ Istio provides traffic management, security, and observability</li>
+                <li>✅ Sidecar proxies (Envoy) intercept all traffic</li>
+                <li>✅ VirtualService: Routing rules</li>
+                <li>✅ DestinationRule: Traffic policies</li>
+                <li>✅ Gateway: Ingress/Egress configuration</li>
+                <li>✅ mTLS enabled by default for service-to-service</li>
+                <li>✅ Kiali for visualization</li>
+                <li>✅ Jaeger for distributed tracing</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
