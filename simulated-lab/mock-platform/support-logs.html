@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Logs - HPE SilverCreek</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="mock-platform">
+    <div class="mock-header">
+        <div class="mock-logo">🌿 HPE SilverCreek</div>
+        <div class="mock-user">
+            <span>🏢 HPE CSP Operations</span>
+            <span style="margin: 0 10px;">|</span>
+            <span>admin@silvercreek.local</span>
+            <span style="cursor: pointer;" onclick="window.location.href='dashboard.html'">🏠</span>
+        </div>
+    </div>
+
+    <div class="mock-grid">
+        <div class="mock-sidebar">
+            <div class="mock-menu-item" onclick="window.location.href='dashboard.html'">
+                📊 Dashboard
+            </div>
+            <div class="mock-menu-item" onclick="alert('Mock VMs page')">
+                🖥️ Virtual Machines
+            </div>
+            <div class="mock-menu-item" onclick="alert('Mock Storage page')">
+                💾 Storage
+            </div>
+            <div class="mock-menu-item active">
+                ⚙️ System
+            </div>
+            <div style="margin-left: 20px;">
+                <div class="mock-menu-item active">
+                    📋 Support Logs
+                </div>
+                <div class="mock-menu-item" onclick="window.location.href='backup.html'">
+                    💾 Backup
+                </div>
+            </div>
+        </div>
+
+        <div class="mock-content">
+            <h1>📋 Support Logs & Bundles</h1>
+            
+            <div class="mock-card">
+                <h2>Generate Support Bundle</h2>
+                <p>A support bundle contains system logs, configurations, and diagnostic information to help troubleshoot issues.</p>
+                
+                <div id="bundleControls" style="margin: 20px 0;">
+                    <button class="mock-button" onclick="generateBundle()" id="generateBtn">
+                        📦 Generate Support Bundle
+                    </button>
+                </div>
+
+                <div id="bundleProgress" style="display: none; margin: 20px 0;">
+                    <h3>⏳ Generating Support Bundle...</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%;">0%</div>
+                    </div>
+                    <p id="progressText" style="color: #6c757d; margin-top: 10px;">Initializing...</p>
+                </div>
+
+                <div id="bundleComplete" style="display: none; margin: 20px 0;">
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="success-icon">✅</div>
+                        <h2 style="color: #01a982;">Support Bundle Generated!</h2>
+                        <div class="mock-card" style="background: #f8f9fa; margin: 20px 0;">
+                            <div class="config-item">
+                                <span class="config-label">Filename:</span>
+                                <span class="config-value" id="bundleFilename"></span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Size:</span>
+                                <span class="config-value" id="bundleSize"></span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Generated:</span>
+                                <span class="config-value" id="bundleTime"></span>
+                            </div>
+                        </div>
+                        <button class="mock-button" onclick="downloadBundle()">
+                            ⬇️ Download Bundle (Simulated)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mock-card">
+                <h2>📚 Previous Support Bundles</h2>
+                <table class="mock-table">
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Generated</th>
+                            <th>Size</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>support-bundle-2025-12-03-143022.tar.gz</td>
+                            <td>Dec 3, 2025 14:30</td>
+                            <td>245 MB</td>
+                            <td><span class="status-badge status-success">Available</span></td>
+                            <td><button class="mock-button" style="padding: 5px 15px; font-size: 0.9em;" onclick="alert('Download simulated')">Download</button></td>
+                        </tr>
+                        <tr>
+                            <td>support-bundle-2025-12-01-091534.tar.gz</td>
+                            <td>Dec 1, 2025 09:15</td>
+                            <td>238 MB</td>
+                            <td><span class="status-badge status-success">Available</span></td>
+                            <td><button class="mock-button" style="padding: 5px 15px; font-size: 0.9em;" onclick="alert('Download simulated')">Download</button></td>
+                        </tr>
+                        <tr>
+                            <td>support-bundle-2025-11-28-162045.tar.gz</td>
+                            <td>Nov 28, 2025 16:20</td>
+                            <td>251 MB</td>
+                            <td><span class="status-badge status-info">Archived</span></td>
+                            <td><button class="mock-button" style="padding: 5px 15px; font-size: 0.9em;" onclick="alert('Download simulated')">Download</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateBundle() {
+            document.getElementById('bundleControls').style.display = 'none';
+            document.getElementById('bundleProgress').style.display = 'block';
+            document.getElementById('bundleComplete').style.display = 'none';
+            
+            let progress = 0;
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            const steps = [
+                'Collecting system logs...',
+                'Gathering VM configurations...',
+                'Exporting network settings...',
+                'Collecting diagnostic data...',
+                'Compressing bundle...',
+                'Finalizing...'
+            ];
+            
+            const interval = setInterval(() => {
+                progress += 20;
+                const stepIndex = Math.min(Math.floor(progress / 20), steps.length - 1);
+                
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                progressText.textContent = steps[stepIndex];
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(showComplete, 500);
+                }
+            }, 800);
+        }
+
+        function showComplete() {
+            document.getElementById('bundleProgress').style.display = 'none';
+            document.getElementById('bundleComplete').style.display = 'block';
+            
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const filename = `support-bundle-${timestamp}.tar.gz`;
+            const size = Math.floor(Math.random() * 50 + 220) + ' MB';
+            
+            document.getElementById('bundleFilename').textContent = filename;
+            document.getElementById('bundleSize').textContent = size;
+            document.getElementById('bundleTime').textContent = now.toLocaleString();
+        }
+
+        function downloadBundle() {
+            alert('✅ In a real system, the bundle would be downloaded now!\n\nThis is a simulated download.');
+        }
+    </script>
+</body>
+</html>

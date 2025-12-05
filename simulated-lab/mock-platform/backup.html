@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup - HPE SilverCreek</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="mock-platform">
+    <div class="mock-header">
+        <div class="mock-logo">🌿 HPE SilverCreek</div>
+        <div class="mock-user">
+            <span>🏢 HPE CSP Operations</span>
+            <span style="margin: 0 10px;">|</span>
+            <span>admin@silvercreek.local</span>
+            <span style="cursor: pointer;" onclick="window.location.href='dashboard.html'">🏠</span>
+        </div>
+    </div>
+
+    <div class="mock-grid">
+        <div class="mock-sidebar">
+            <div class="mock-menu-item" onclick="window.location.href='dashboard.html'">
+                📊 Dashboard
+            </div>
+            <div class="mock-menu-item" onclick="alert('Mock VMs page')">
+                🖥️ Virtual Machines
+            </div>
+            <div class="mock-menu-item" onclick="alert('Mock Storage page')">
+                💾 Storage
+            </div>
+            <div class="mock-menu-item active">
+                ⚙️ System
+            </div>
+            <div style="margin-left: 20px;">
+                <div class="mock-menu-item" onclick="window.location.href='support-logs.html'">
+                    📋 Support Logs
+                </div>
+                <div class="mock-menu-item active">
+                    💾 Backup
+                </div>
+            </div>
+        </div>
+
+        <div class="mock-content">
+            <h1>💾 Backup & Restore</h1>
+            
+            <div class="mock-card">
+                <h2>Backup Storage Location (BSL)</h2>
+                <div id="bslStatus">
+                    <div class="tip-box">
+                        <strong>💡 Status:</strong> <span class="status-badge status-success">Configured</span>
+                    </div>
+                    <div class="config-box" style="margin: 20px 0;">
+                        <div class="config-item">
+                            <span class="config-label">Endpoint:</span>
+                            <span class="config-value">https://mock-minio.local:9000</span>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">Bucket:</span>
+                            <span class="config-value">simulated-backups</span>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">Region:</span>
+                            <span class="config-value">us-east-1</span>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">Status:</span>
+                            <span class="status-badge status-success">Connected</span>
+                        </div>
+                    </div>
+                    <button class="mock-button" onclick="showBSLConfig()">
+                        ⚙️ Reconfigure BSL
+                    </button>
+                </div>
+            </div>
+
+            <div class="mock-card" id="bslConfigForm" style="display: none;">
+                <h2>Configure Backup Storage Location</h2>
+                <form onsubmit="saveBSL(event)">
+                    <div class="form-group">
+                        <label>S3-Compatible Endpoint URL</label>
+                        <input type="text" class="mock-input" value="https://mock-minio.local:9000" placeholder="https://s3.amazonaws.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Access Key</label>
+                        <input type="text" class="mock-input" value="demo_access_key" placeholder="Your access key">
+                    </div>
+                    <div class="form-group">
+                        <label>Secret Key</label>
+                        <input type="password" class="mock-input" value="demo_secret_key" placeholder="Your secret key">
+                    </div>
+                    <div class="form-group">
+                        <label>Bucket Name</label>
+                        <input type="text" class="mock-input" value="simulated-backups" placeholder="my-backups">
+                    </div>
+                    <div class="form-group">
+                        <label>Region</label>
+                        <input type="text" class="mock-input" value="us-east-1" placeholder="us-east-1">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="mock-button" onclick="validateBSL()">✓ Validate Connection</button>
+                        <button type="submit" class="mock-button">💾 Save Configuration</button>
+                        <button type="button" class="mock-button" style="background: #6c757d;" onclick="cancelBSL()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="mock-card">
+                <h2>Create Backup</h2>
+                <p>Create a full system backup including VMs, configurations, and persistent volumes.</p>
+                
+                <div id="backupControls">
+                    <button class="mock-button" onclick="createBackup()" style="font-size: 1.1em; padding: 15px 30px;">
+                        📦 Create Backup Now
+                    </button>
+                </div>
+
+                <div id="backupProgress" style="display: none; margin: 20px 0;">
+                    <h3>⏳ Creating Backup...</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%;">0%</div>
+                    </div>
+                    <p id="progressText" style="color: #6c757d; margin-top: 10px;">Initializing backup...</p>
+                </div>
+
+                <div id="backupComplete" style="display: none; margin: 20px 0;">
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="success-icon">✅</div>
+                        <h2 style="color: #01a982;">Backup Created Successfully!</h2>
+                        <div class="mock-card" style="background: #f8f9fa; margin: 20px 0;">
+                            <div class="config-item">
+                                <span class="config-label">Backup Name:</span>
+                                <span class="config-value" id="backupName"></span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Size:</span>
+                                <span class="config-value" id="backupSize"></span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Duration:</span>
+                                <span class="config-value" id="backupDuration"></span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Timestamp:</span>
+                                <span class="config-value" id="backupTime"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mock-card">
+                <h2>📚 Backup History</h2>
+                <table class="mock-table">
+                    <thead>
+                        <tr>
+                            <th>Backup Name</th>
+                            <th>Created</th>
+                            <th>Size</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backupHistory">
+                        <tr>
+                            <td>backup-2025-12-03-150000</td>
+                            <td>Dec 3, 2025 15:00</td>
+                            <td>12.4 GB</td>
+                            <td>18m 32s</td>
+                            <td><span class="status-badge status-success">Completed</span></td>
+                            <td><button class="mock-button" style="padding: 5px 15px; font-size: 0.9em;" onclick="alert('Restore simulated')">Restore</button></td>
+                        </tr>
+                        <tr>
+                            <td>backup-2025-12-02-140000</td>
+                            <td>Dec 2, 2025 14:00</td>
+                            <td>11.8 GB</td>
+                            <td>17m 45s</td>
+                            <td><span class="status-badge status-success">Completed</span></td>
+                            <td><button class="mock-button" style="padding: 5px 15px; font-size: 0.9em;" onclick="alert('Restore simulated')">Restore</button></td>
+                        </tr>
+                        <tr>
+                            <td>backup-2025-12-01-130000</td>
+                            <td>Dec 1, 2025 13:00</td>
+                            <td>11.2 GB</td>
+                            <td>16m 58s</td>
+                            <td><span class="status-badge status-success">Completed</span></td>
+                            <td><button class="mock-button" style="padding: 5px 15px; font-size: 0.9em;" onclick="alert('Restore simulated')">Restore</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showBSLConfig() {
+            document.getElementById('bslConfigForm').style.display = 'block';
+        }
+
+        function cancelBSL() {
+            document.getElementById('bslConfigForm').style.display = 'none';
+        }
+
+        function validateBSL() {
+            alert('✅ Connection validated successfully!\n\nThe BSL configuration is valid and the bucket is accessible.');
+        }
+
+        function saveBSL(event) {
+            event.preventDefault();
+            alert('✅ BSL configuration saved successfully!');
+            document.getElementById('bslConfigForm').style.display = 'none';
+        }
+
+        function createBackup() {
+            document.getElementById('backupControls').style.display = 'none';
+            document.getElementById('backupProgress').style.display = 'block';
+            document.getElementById('backupComplete').style.display = 'none';
+            
+            let progress = 0;
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            const steps = [
+                'Preparing backup environment...',
+                'Snapshotting virtual machines...',
+                'Backing up persistent volumes...',
+                'Exporting configurations...',
+                'Compressing data...',
+                'Uploading to S3...',
+                'Verifying backup integrity...',
+                'Finalizing backup...'
+            ];
+            
+            const interval = setInterval(() => {
+                progress += 12.5;
+                const stepIndex = Math.min(Math.floor(progress / 12.5), steps.length - 1);
+                
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = Math.floor(progress) + '%';
+                progressText.textContent = steps[stepIndex];
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(showBackupComplete, 500);
+                }
+            }, 1200);
+        }
+
+        function showBackupComplete() {
+            document.getElementById('backupProgress').style.display = 'none';
+            document.getElementById('backupComplete').style.display = 'block';
+            
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const backupName = `backup-${timestamp}`;
+            const size = (Math.random() * 5 + 10).toFixed(1) + ' GB';
+            const duration = Math.floor(Math.random() * 5 + 15) + 'm ' + Math.floor(Math.random() * 60) + 's';
+            
+            document.getElementById('backupName').textContent = backupName;
+            document.getElementById('backupSize').textContent = size;
+            document.getElementById('backupDuration').textContent = duration;
+            document.getElementById('backupTime').textContent = now.toLocaleString();
+            
+            // Add to history table
+            const table = document.getElementById('backupHistory');
+            const newRow = table.insertRow(0);
+            newRow.innerHTML = `
+                <td>${backupName}</td>
+                <td>${now.toLocaleString().split(',')[0]}</td>
+                <td>${size}</td>
+                <td>${duration}</td>
+                <td><span class="status-badge status-success">Completed</span></td>
+                <td><button class="mock-button" style="padding: 5px 15px; font-size: 0.9em;" onclick="alert('Restore simulated')">Restore</button></td>
+            `;
+        }
+    </script>
+</body>
+</html>
