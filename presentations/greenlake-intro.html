@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPE GreenLake: Cloud Services Everywhere</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 1200px;
+            height: 675px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Title Slide */
+        .title-slide {
+            background: linear-gradient(135deg, #01a982 0%, #00c896 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .title-slide h1 {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .title-slide .subtitle {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .title-slide .hpe-logo {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            margin-top: 40px;
+        }
+
+        /* Content Slides */
+        .content-slide {
+            padding: 60px 80px;
+        }
+
+        .slide-header {
+            border-bottom: 4px solid #01a982;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        .slide-header h2 {
+            font-size: 48px;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .slide-content {
+            font-size: 24px;
+            line-height: 1.8;
+            color: #4a5568;
+        }
+
+        .slide-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .slide-content li {
+            padding: 20px;
+            margin: 15px 0;
+            background: linear-gradient(90deg, #f7fafc 0%, #edf2f7 100%);
+            border-left: 6px solid #01a982;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .slide-content li:hover {
+            transform: translateX(10px);
+        }
+
+        .icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #01a982;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        /* Special Slides */
+        .comparison-slide {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 60px;
+        }
+
+        .comparison-column {
+            background: #f7fafc;
+            border-radius: 16px;
+            padding: 40px;
+        }
+
+        .comparison-column h3 {
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: #2d3748;
+            text-align: center;
+        }
+
+        .comparison-column.traditional {
+            border-top: 8px solid #e53e3e;
+        }
+
+        .comparison-column.greenlake {
+            border-top: 8px solid #01a982;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .feature-card .emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h4 {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 18px;
+            color: #718096;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide.active .slide-content li {
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .slide.active .slide-content li:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .slide-content li:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .slide-content li:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active .slide-content li:nth-child(4) { animation-delay: 0.4s; }
+        .slide.active .slide-content li:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active title-slide">
+            <h1>HPE GreenLake</h1>
+            <div class="subtitle">Cloud Services. Everywhere.</div>
+            <div class="subtitle">Experience the cloud where you need it</div>
+            <div class="hpe-logo">HPE</div>
+        </div>
+
+        <!-- Slide 2: What is GreenLake? -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>What is HPE GreenLake?</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">☁️</span> <strong>Cloud Operating Model</strong> - Get the cloud experience on your terms, anywhere</li>
+                    <li><span class="icon">💳</span> <strong>Pay-As-You-Go</strong> - Pay only for what you use, scale as needed</li>
+                    <li><span class="icon">🏢</span> <strong>On-Premises Control</strong> - Keep data on-site while getting cloud benefits</li>
+                    <li><span class="icon">🔧</span> <strong>Fully Managed</strong> - HPE handles infrastructure management for you</li>
+                    <li><span class="icon">📊</span> <strong>Unified Platform</strong> - Manage all workloads from one console</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: Traditional IT vs GreenLake -->
+        <div class="slide">
+            <div class="comparison-slide">
+                <div class="comparison-column traditional">
+                    <h3>❌ Traditional IT</h3>
+                    <div class="slide-content">
+                        <ul style="font-size: 20px;">
+                            <li>Large upfront capital investment</li>
+                            <li>Long procurement cycles</li>
+                            <li>Over-provisioning for peak capacity</li>
+                            <li>Manual management overhead</li>
+                            <li>Capacity planning challenges</li>
+                            <li>Hardware refresh cycles</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="comparison-column greenlake">
+                    <h3>✅ HPE GreenLake</h3>
+                    <div class="slide-content">
+                        <ul style="font-size: 20px;">
+                            <li>No upfront costs, pay per use</li>
+                            <li>Rapid deployment in weeks</li>
+                            <li>Right-sized capacity with buffer</li>
+                            <li>Fully managed by HPE</li>
+                            <li>Flexible scaling up or down</li>
+                            <li>Always current technology</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Key Benefits -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>Why Choose GreenLake?</h2>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="emoji">💰</div>
+                    <h4>Cost Efficiency</h4>
+                    <p>Reduce costs by up to 40% vs traditional IT</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">⚡</div>
+                    <h4>Agility</h4>
+                    <p>Deploy new services in days, not months</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">🔒</div>
+                    <h4>Data Security</h4>
+                    <p>Keep sensitive data on-premises</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">🌍</div>
+                    <h4>Sustainability</h4>
+                    <p>Optimize resource usage, reduce waste</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Use Cases -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>Perfect For</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">🏥</span> <strong>Healthcare</strong> - Secure patient data with on-premises cloud benefits</li>
+                    <li><span class="icon">🏦</span> <strong>Financial Services</strong> - Meet compliance while gaining cloud flexibility</li>
+                    <li><span class="icon">🏭</span> <strong>Manufacturing</strong> - Edge computing for real-time processing</li>
+                    <li><span class="icon">🛒</span> <strong>Retail</strong> - Scale for seasonal demand, pay for what you use</li>
+                    <li><span class="icon">🎓</span> <strong>Education</strong> - Flexible capacity for varying student loads</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 6: Services Offered -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>GreenLake Services Portfolio</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">☁️</span> <strong>Private Cloud</strong> - VMware, containers, bare metal options</li>
+                    <li><span class="icon">💾</span> <strong>Storage & Backup</strong> - Block, file, object storage with data protection</li>
+                    <li><span class="icon">🖥️</span> <strong>Compute</strong> - High-performance computing, VDI, SAP workloads</li>
+                    <li><span class="icon">📊</span> <strong>Data Services</strong> - Analytics, ML, databases as a service</li>
+                    <li><span class="icon">🔐</span> <strong>Networking</strong> - Aruba networking with cloud management</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 7: How It Works -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>How GreenLake Works</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">1</span> <strong>Design</strong> - HPE works with you to understand requirements</li>
+                    <li><span class="icon">2</span> <strong>Deploy</strong> - Infrastructure installed at your location in weeks</li>
+                    <li><span class="icon">3</span> <strong>Manage</strong> - HPE monitors and manages 24/7 from the cloud</li>
+                    <li><span class="icon">4</span> <strong>Scale</strong> - Add or reduce capacity as business needs change</li>
+                    <li><span class="icon">5</span> <strong>Optimize</strong> - Continuous recommendations for improvement</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 8: Call to Action -->
+        <div class="slide title-slide" style="background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);">
+            <h1 style="font-size: 64px;">Ready to Transform Your IT?</h1>
+            <div class="subtitle" style="font-size: 28px; margin-top: 40px;">
+                Experience cloud benefits without the complexity
+            </div>
+            <div class="subtitle" style="font-size: 24px; margin-top: 30px; opacity: 0.8;">
+                📧 Contact your HPE representative<br>
+                🌐 Visit hpe.com/greenlake<br>
+                📞 Start your cloud journey today
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">8</span>
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="previousSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+    </script>
+</body>
+</html>

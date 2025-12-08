@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Computing Fundamentals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 1200px;
+            height: 675px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Title Slide */
+        .title-slide {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .title-slide h1 {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .title-slide .cloud-icon {
+            font-size: 120px;
+            margin: 30px 0;
+        }
+
+        .title-slide .subtitle {
+            font-size: 32px;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        /* Content Slides */
+        .content-slide {
+            padding: 60px 80px;
+        }
+
+        .slide-header {
+            border-bottom: 4px solid #f5576c;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        .slide-header h2 {
+            font-size: 48px;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .slide-content {
+            font-size: 24px;
+            line-height: 1.8;
+            color: #4a5568;
+        }
+
+        .slide-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .slide-content li {
+            padding: 20px;
+            margin: 15px 0;
+            background: linear-gradient(90deg, #f7fafc 0%, #edf2f7 100%);
+            border-left: 6px solid #f5576c;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .slide-content li:hover {
+            transform: translateX(10px);
+        }
+
+        .icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #f5576c;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        /* Cloud Models Diagram */
+        .cloud-models {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .cloud-model {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 6px solid #f5576c;
+        }
+
+        .cloud-model.public { border-top-color: #4299e1; }
+        .cloud-model.private { border-top-color: #48bb78; }
+        .cloud-model.hybrid { border-top-color: #ed8936; }
+
+        .cloud-model .emoji {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .cloud-model h4 {
+            font-size: 28px;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .cloud-model p {
+            font-size: 18px;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Service Models Stack */
+        .service-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .service-layer {
+            padding: 30px;
+            border-radius: 12px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-layer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .service-layer h3 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .service-layer p {
+            font-size: 20px;
+            opacity: 0.95;
+            position: relative;
+        }
+
+        .service-layer.iaas {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .service-layer.paas {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .service-layer.saas {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* Comparison Table */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .comparison-box {
+            background: #f7fafc;
+            padding: 40px;
+            border-radius: 16px;
+        }
+
+        .comparison-box h3 {
+            font-size: 32px;
+            color: #2d3748;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .comparison-box.before {
+            border-top: 6px solid #e53e3e;
+        }
+
+        .comparison-box.after {
+            border-top: 6px solid #48bb78;
+        }
+
+        .comparison-list {
+            font-size: 20px;
+            line-height: 2;
+            color: #4a5568;
+        }
+
+        /* Benefits Grid */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .benefit-card .emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .benefit-card h4 {
+            font-size: 22px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .benefit-card p {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide.active .slide-content li,
+        .slide.active .cloud-model,
+        .slide.active .benefit-card,
+        .slide.active .service-layer {
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .slide.active .slide-content li:nth-child(1),
+        .slide.active .cloud-model:nth-child(1),
+        .slide.active .benefit-card:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .slide-content li:nth-child(2),
+        .slide.active .cloud-model:nth-child(2),
+        .slide.active .benefit-card:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .slide-content li:nth-child(3),
+        .slide.active .cloud-model:nth-child(3),
+        .slide.active .benefit-card:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active .benefit-card:nth-child(4) { animation-delay: 0.4s; }
+        .slide.active .benefit-card:nth-child(5) { animation-delay: 0.5s; }
+        .slide.active .benefit-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .slide.active .service-layer:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .service-layer:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .service-layer:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active title-slide">
+            <h1>Cloud Computing</h1>
+            <div class="cloud-icon">☁️</div>
+            <div class="subtitle">Fundamentals for Everyone</div>
+        </div>
+
+        <!-- Slide 2: What is Cloud Computing? -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>What is Cloud Computing?</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">💡</span> <strong>On-Demand Resources</strong> - Get computing power when you need it, instantly</li>
+                    <li><span class="icon">🌐</span> <strong>Over the Internet</strong> - Access from anywhere with internet connection</li>
+                    <li><span class="icon">💳</span> <strong>Pay-As-You-Go</strong> - Only pay for what you actually use, like electricity</li>
+                    <li><span class="icon">🔧</span> <strong>Someone Else's Computer</strong> - You don't own or maintain the hardware</li>
+                    <li><span class="icon">📈</span> <strong>Infinitely Scalable</strong> - Grow from 10 users to 10 million seamlessly</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: Before vs After Cloud -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>The Cloud Revolution</h2>
+            </div>
+            <div class="comparison-grid">
+                <div class="comparison-box before">
+                    <h3>❌ Before Cloud (2000s)</h3>
+                    <div class="comparison-list">
+                        • Buy expensive servers<br>
+                        • Wait weeks for delivery<br>
+                        • Hire IT staff to manage<br>
+                        • Pay for unused capacity<br>
+                        • Hardware becomes outdated<br>
+                        • Limited to one location<br>
+                        • Disaster = total loss
+                    </div>
+                </div>
+                <div class="comparison-box after">
+                    <h3>✅ With Cloud (Today)</h3>
+                    <div class="comparison-list">
+                        • Click a button, get servers<br>
+                        • Start in minutes<br>
+                        • Provider manages everything<br>
+                        • Pay only for what you use<br>
+                        • Always latest technology<br>
+                        • Deploy globally<br>
+                        • Built-in redundancy
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Cloud Deployment Models -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>Types of Cloud</h2>
+            </div>
+            <div class="cloud-models">
+                <div class="cloud-model public">
+                    <div class="emoji">🌍</div>
+                    <h4>Public Cloud</h4>
+                    <p>Shared infrastructure owned by providers like AWS, Azure, Google Cloud. Great for startups and web apps.</p>
+                    <p style="margin-top: 15px; font-weight: 600;">Examples: Netflix, Spotify</p>
+                </div>
+                <div class="cloud-model private">
+                    <div class="emoji">🏢</div>
+                    <h4>Private Cloud</h4>
+                    <p>Dedicated infrastructure for one organization. On-site or hosted. Ideal for compliance and security.</p>
+                    <p style="margin-top: 15px; font-weight: 600;">Examples: Banks, Healthcare</p>
+                </div>
+                <div class="cloud-model hybrid">
+                    <div class="emoji">🔀</div>
+                    <h4>Hybrid Cloud</h4>
+                    <p>Mix of public and private. Sensitive data stays private, everything else goes public. Best of both worlds.</p>
+                    <p style="margin-top: 15px; font-weight: 600;">Examples: Large Enterprises</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Service Models (IaaS, PaaS, SaaS) -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>Cloud Service Models</h2>
+            </div>
+            <div class="service-stack">
+                <div class="service-layer saas">
+                    <h3>SaaS - Software as a Service</h3>
+                    <p>📧 Just use the app: Gmail, Salesforce, Office 365. No installation needed.</p>
+                </div>
+                <div class="service-layer paas">
+                    <h3>PaaS - Platform as a Service</h3>
+                    <p>🛠️ Build apps here: Heroku, Google App Engine. You write code, they run it.</p>
+                </div>
+                <div class="service-layer iaas">
+                    <h3>IaaS - Infrastructure as a Service</h3>
+                    <p>🖥️ Rent raw resources: AWS EC2, Azure VMs. You manage everything above hardware.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Real-World Analogy -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>Pizza as a Service 🍕</h2>
+            </div>
+            <div class="slide-content" style="font-size: 22px;">
+                <ul>
+                    <li><span class="icon">🏠</span> <strong>On-Premises (Traditional IT)</strong> - You make pizza from scratch at home. Buy ingredients, cook, clean up. Full control, maximum work.</li>
+                    <li><span class="icon">🛒</span> <strong>IaaS (Infrastructure)</strong> - You get a ready kitchen and oven. Bring your own recipe and ingredients. You still cook.</li>
+                    <li><span class="icon">👨‍🍳</span> <strong>PaaS (Platform)</strong> - You get a pizza kit with dough and sauce. Just add toppings and bake. Less work, some customization.</li>
+                    <li><span class="icon">🚗</span> <strong>SaaS (Software)</strong> - Order delivery pizza. They make it, deliver it, you eat it. Zero work, just consume.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 7: Benefits of Cloud -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>Why Everyone Loves Cloud</h2>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="emoji">💰</div>
+                    <h4>Cost Savings</h4>
+                    <p>No hardware to buy. Pay monthly like a utility bill.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="emoji">⚡</div>
+                    <h4>Speed</h4>
+                    <p>Launch apps in minutes, not months. Faster time to market.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="emoji">🌍</div>
+                    <h4>Global Reach</h4>
+                    <p>Deploy worldwide with clicks. Low latency everywhere.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="emoji">📈</div>
+                    <h4>Elasticity</h4>
+                    <p>Scale up during Black Friday. Scale down after. Automatic.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="emoji">🔐</div>
+                    <h4>Security</h4>
+                    <p>Enterprise-grade security. Better than most can build.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="emoji">🛡️</div>
+                    <h4>Reliability</h4>
+                    <p>99.99% uptime. Multiple backups. Disaster recovery built-in.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Major Cloud Providers -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>The Big Players</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">📦</span> <strong>Amazon Web Services (AWS)</strong> - The pioneer. 32% market share. Netflix, Airbnb run here.</li>
+                    <li><span class="icon">💼</span> <strong>Microsoft Azure</strong> - Enterprise favorite. 23% market share. Windows, Office365 integration.</li>
+                    <li><span class="icon">🔍</span> <strong>Google Cloud (GCP)</strong> - AI/ML leader. 10% market share. YouTube, Gmail infrastructure.</li>
+                    <li><span class="icon">☁️</span> <strong>HPE GreenLake</strong> - Private cloud as-a-service. On-prem with cloud benefits.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 9: Common Cloud Services -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>What Can You Do in the Cloud?</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">🖥️</span> <strong>Virtual Machines</strong> - Run Windows or Linux servers without buying hardware</li>
+                    <li><span class="icon">💾</span> <strong>Storage</strong> - Store unlimited files, photos, backups. Accessible anywhere.</li>
+                    <li><span class="icon">🗄️</span> <strong>Databases</strong> - MySQL, PostgreSQL, MongoDB managed for you</li>
+                    <li><span class="icon">🤖</span> <strong>AI & Machine Learning</strong> - Train models without expensive GPUs</li>
+                    <li><span class="icon">📊</span> <strong>Analytics</strong> - Process billions of records in seconds</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 10: Getting Started -->
+        <div class="slide content-slide">
+            <div class="slide-header">
+                <h2>How to Start Your Cloud Journey</h2>
+            </div>
+            <div class="slide-content">
+                <ul>
+                    <li><span class="icon">1</span> <strong>Free Tier</strong> - AWS, Azure, GCP offer free credits. Experiment at no cost.</li>
+                    <li><span class="icon">2</span> <strong>Learn Basics</strong> - Understand VMs, storage, networking. Start simple.</li>
+                    <li><span class="icon">3</span> <strong>Build a Project</strong> - Host a website, create an app, deploy a database.</li>
+                    <li><span class="icon">4</span> <strong>Get Certified</strong> - AWS Certified, Azure Fundamentals boost career.</li>
+                    <li><span class="icon">5</span> <strong>Think Cloud-First</strong> - New projects? Consider cloud from day one.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 11: Call to Action -->
+        <div class="slide title-slide" style="background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);">
+            <div class="cloud-icon">☁️</div>
+            <h1 style="font-size: 56px;">Welcome to the Cloud Era</h1>
+            <div class="subtitle" style="font-size: 24px; margin-top: 40px;">
+                💡 The future is cloud-native<br>
+                🚀 Start building today<br>
+                🌍 Think global from day one<br>
+                📚 Never stop learning
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">11</span>
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="previousSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+    </script>
+</body>
+</html>
