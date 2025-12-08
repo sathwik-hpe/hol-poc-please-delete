@@ -56,24 +56,55 @@
             color: white;
             text-align: center;
             padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title-slide::before {
+            content: '☁️';
+            position: absolute;
+            font-size: 400px;
+            opacity: 0.1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+            50% { transform: translate(-50%, -50%) translateY(-20px); }
         }
 
         .title-slide h1 {
-            font-size: 72px;
+            font-size: 92px;
             font-weight: 800;
             margin-bottom: 20px;
-            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            letter-spacing: -3px;
         }
 
         .title-slide .cloud-icon {
-            font-size: 120px;
+            font-size: 140px;
             margin: 30px 0;
+            position: relative;
+            z-index: 1;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
         .title-slide .subtitle {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 300;
             opacity: 0.95;
+            position: relative;
+            z-index: 1;
         }
 
         /* Content Slides */
@@ -105,16 +136,19 @@
         }
 
         .slide-content li {
-            padding: 20px;
-            margin: 15px 0;
-            background: linear-gradient(90deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 25px 30px;
+            margin: 18px 0;
+            background: white;
             border-left: 6px solid #f5576c;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .slide-content li:hover {
-            transform: translateX(10px);
+            transform: translateX(15px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(245,87,108,0.15);
+            border-left-width: 8px;
         }
 
         .icon {
@@ -141,32 +175,73 @@
 
         .cloud-model {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             text-align: center;
             border-top: 6px solid #f5576c;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .cloud-model.public { border-top-color: #4299e1; }
-        .cloud-model.private { border-top-color: #48bb78; }
-        .cloud-model.hybrid { border-top-color: #ed8936; }
+        .cloud-model::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #f5576c 0%, #f093fb 100%);
+        }
+
+        .cloud-model:hover {
+            transform: translateY(-12px) scale(1.05);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+        }
+
+        .cloud-model.public { 
+            border-top-color: #4299e1;
+        }
+
+        .cloud-model.public::before {
+            background: linear-gradient(90deg, #4299e1 0%, #90cdf4 100%);
+        }
+
+        .cloud-model.private { 
+            border-top-color: #48bb78;
+        }
+
+        .cloud-model.private::before {
+            background: linear-gradient(90deg, #48bb78 0%, #9ae6b4 100%);
+        }
+
+        .cloud-model.hybrid { 
+            border-top-color: #ed8936;
+        }
+
+        .cloud-model.hybrid::before {
+            background: linear-gradient(90deg, #ed8936 0%, #fbd38d 100%);
+        }
 
         .cloud-model .emoji {
-            font-size: 64px;
-            margin-bottom: 20px;
+            font-size: 72px;
+            margin-bottom: 25px;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
         }
 
         .cloud-model h4 {
-            font-size: 28px;
+            font-size: 32px;
             color: #2d3748;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-weight: 700;
         }
 
         .cloud-model p {
-            font-size: 18px;
+            font-size: 19px;
             color: #718096;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
         /* Service Models Stack */
@@ -178,11 +253,18 @@
         }
 
         .service-layer {
-            padding: 30px;
-            border-radius: 12px;
+            padding: 40px;
+            border-radius: 16px;
             color: white;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .service-layer:hover {
+            transform: translateX(10px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
         }
 
         .service-layer::before {
@@ -192,19 +274,21 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
         }
 
         .service-layer h3 {
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 36px;
+            margin-bottom: 15px;
             position: relative;
+            font-weight: 700;
         }
 
         .service-layer p {
-            font-size: 20px;
+            font-size: 22px;
             opacity: 0.95;
             position: relative;
+            line-height: 1.6;
         }
 
         .service-layer.iaas {
@@ -228,24 +312,34 @@
         }
 
         .comparison-box {
-            background: #f7fafc;
-            padding: 40px;
-            border-radius: 16px;
+            background: white;
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: all 0.3s ease;
+        }
+
+        .comparison-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.18);
         }
 
         .comparison-box h3 {
-            font-size: 32px;
+            font-size: 36px;
             color: #2d3748;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             text-align: center;
+            font-weight: 700;
         }
 
         .comparison-box.before {
-            border-top: 6px solid #e53e3e;
+            border-top: 8px solid #e53e3e;
+            background: linear-gradient(180deg, #fff5f5 0%, white 20%);
         }
 
         .comparison-box.after {
-            border-top: 6px solid #48bb78;
+            border-top: 8px solid #48bb78;
+            background: linear-gradient(180deg, #f0fdf4 0%, white 20%);
         }
 
         .comparison-list {
@@ -264,26 +358,48 @@
 
         .benefit-card {
             background: white;
-            padding: 30px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 35px 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 32px rgba(245,87,108,0.2);
         }
 
         .benefit-card .emoji {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 56px;
+            margin-bottom: 18px;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
         }
 
         .benefit-card h4 {
-            font-size: 22px;
+            font-size: 24px;
             color: #2d3748;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-weight: 700;
         }
 
         .benefit-card p {
-            font-size: 16px;
+            font-size: 17px;
             color: #718096;
+            line-height: 1.5;
         }
 
         /* Navigation */

@@ -62,27 +62,70 @@
             color: white;
             text-align: center;
             padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title-slide::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .title-slide::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); }
         }
 
         .title-slide h1 {
-            font-size: 72px;
+            font-size: 84px;
             font-weight: 800;
             margin-bottom: 20px;
-            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+            letter-spacing: -2px;
         }
 
         .title-slide .subtitle {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 300;
             margin-bottom: 40px;
             opacity: 0.95;
+            position: relative;
+            z-index: 1;
         }
 
         .title-slide .hpe-logo {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 700;
-            letter-spacing: 8px;
+            letter-spacing: 12px;
             margin-top: 40px;
+            position: relative;
+            z-index: 1;
+            padding: 20px 50px;
+            border: 3px solid white;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
         }
 
         /* Content Slides */
@@ -114,16 +157,19 @@
         }
 
         .slide-content li {
-            padding: 20px;
-            margin: 15px 0;
-            background: linear-gradient(90deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 25px 30px;
+            margin: 18px 0;
+            background: white;
             border-left: 6px solid #01a982;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .slide-content li:hover {
-            transform: translateX(10px);
+            transform: translateX(15px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(1,169,130,0.15);
+            border-left-width: 8px;
         }
 
         .icon {
@@ -148,9 +194,15 @@
         }
 
         .comparison-column {
-            background: #f7fafc;
-            border-radius: 16px;
-            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            padding: 45px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: transform 0.3s ease;
+        }
+
+        .comparison-column:hover {
+            transform: scale(1.05);
         }
 
         .comparison-column h3 {
@@ -158,14 +210,17 @@
             margin-bottom: 30px;
             color: #2d3748;
             text-align: center;
+            font-weight: 700;
         }
 
         .comparison-column.traditional {
             border-top: 8px solid #e53e3e;
+            background: linear-gradient(180deg, #fff5f5 0%, white 20%);
         }
 
         .comparison-column.greenlake {
             border-top: 8px solid #01a982;
+            background: linear-gradient(180deg, #f0fdf9 0%, white 20%);
         }
 
         .feature-grid {
@@ -177,26 +232,53 @@
 
         .feature-card {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #01a982 0%, #00c896 100%);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 32px rgba(1,169,130,0.2);
         }
 
         .feature-card .emoji {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .feature-card h4 {
-            font-size: 24px;
+            font-size: 28px;
             color: #2d3748;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
 
         .feature-card p {
             font-size: 18px;
             color: #718096;
+            line-height: 1.6;
         }
 
         /* Navigation */

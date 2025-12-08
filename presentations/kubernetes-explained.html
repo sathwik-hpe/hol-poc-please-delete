@@ -56,24 +56,56 @@
             color: white;
             text-align: center;
             padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title-slide::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -300px;
+            left: -300px;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .title-slide h1 {
-            font-size: 72px;
+            font-size: 92px;
             font-weight: 800;
             margin-bottom: 20px;
-            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            letter-spacing: -3px;
         }
 
         .title-slide .k8s-icon {
-            font-size: 120px;
+            font-size: 140px;
             margin: 30px 0;
+            position: relative;
+            z-index: 1;
+            animation: spin 20s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .title-slide .subtitle {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 300;
             opacity: 0.95;
+            position: relative;
+            z-index: 1;
         }
 
         /* Content Slides */
@@ -105,16 +137,19 @@
         }
 
         .slide-content li {
-            padding: 20px;
-            margin: 15px 0;
-            background: linear-gradient(90deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 25px 30px;
+            margin: 18px 0;
+            background: white;
             border-left: 6px solid #326ce5;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .slide-content li:hover {
-            transform: translateX(10px);
+            transform: translateX(15px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(50,108,229,0.15);
+            border-left-width: 8px;
         }
 
         .icon {
@@ -155,15 +190,37 @@
 
         .control-plane {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px;
-            border-radius: 16px;
+            padding: 50px;
+            border-radius: 20px;
             color: white;
             text-align: center;
+            box-shadow: 0 12px 32px rgba(102,126,234,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-plane::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
         }
 
         .control-plane h3 {
-            font-size: 32px;
+            font-size: 36px;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
         }
 
         .control-components {
@@ -174,11 +231,21 @@
         }
 
         .component-box {
-            background: rgba(255,255,255,0.2);
-            padding: 15px;
-            border-radius: 8px;
+            background: rgba(255,255,255,0.25);
+            padding: 20px;
+            border-radius: 12px;
             font-size: 16px;
             backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .component-box:hover {
+            background: rgba(255,255,255,0.35);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         }
 
         .worker-nodes {
@@ -188,17 +255,26 @@
         }
 
         .node {
-            background: #f7fafc;
-            border: 3px solid #326ce5;
-            border-radius: 12px;
-            padding: 30px 20px;
+            background: white;
+            border: 4px solid #326ce5;
+            border-radius: 16px;
+            padding: 35px 25px;
             text-align: center;
+            box-shadow: 0 8px 20px rgba(50,108,229,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 32px rgba(50,108,229,0.25);
+            border-color: #2563eb;
         }
 
         .node h4 {
-            font-size: 24px;
+            font-size: 26px;
             color: #2d3748;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-weight: 700;
         }
 
         .pods {
@@ -208,12 +284,19 @@
         }
 
         .pod {
-            background: #326ce5;
+            background: linear-gradient(135deg, #326ce5 0%, #5a8df7 100%);
             color: white;
-            padding: 15px 10px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 18px 12px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 600;
+            box-shadow: 0 4px 8px rgba(50,108,229,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .pod:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(50,108,229,0.4);
         }
 
         /* Feature Grid */
@@ -226,27 +309,37 @@
 
         .feature-card {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             text-align: center;
             border-top: 4px solid #326ce5;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 32px rgba(50,108,229,0.2);
         }
 
         .feature-card .emoji {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
         }
 
         .feature-card h4 {
-            font-size: 24px;
+            font-size: 26px;
             color: #2d3748;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
 
         .feature-card p {
             font-size: 18px;
             color: #718096;
+            line-height: 1.6;
         }
 
         /* Timeline */
