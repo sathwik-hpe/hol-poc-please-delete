@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kubernetes Explained: Container Orchestration for Everyone</title>
+    <title>Kubernetes Explained</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #000;
             overflow: hidden;
         }
 
@@ -28,7 +28,6 @@
             background: linear-gradient(135deg, #326ce5 0%, #2563eb 100%);
             color: white;
             text-align: center;
-            position: relative;
             z-index: 2000;
         }
 
@@ -43,8 +42,14 @@
         }
 
         .start-screen .k8s-icon {
-            font-size: 120px;
-            margin: 30px 0;
+            font-size: 100px;
+            margin: 20px 0;
+            animation: spin 20s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .start-screen p {
@@ -71,6 +76,7 @@
             box-shadow: 0 12px 32px rgba(0,0,0,0.3);
         }
 
+        /* Slide Container */
         .presentation {
             width: 100vw;
             height: 100vh;
@@ -80,107 +86,53 @@
         .slide {
             width: 100vw;
             height: 100vh;
-            background: white;
             display: none;
             position: absolute;
             top: 0;
             left: 0;
-            overflow: hidden;
+            padding: 80px 100px;
         }
 
         .slide.active {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Title Slide */
-        .title-slide {
-            background: linear-gradient(135deg, #326ce5 0%, #2563eb 100%);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 60px;
-            position: relative;
-            overflow: hidden;
+            animation: fadeIn 0.5s ease;
         }
 
-        .title-slide::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            top: -300px;
-            left: -300px;
-            animation: rotate 20s linear infinite;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .title-slide h1 {
-            font-size: 92px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            text-shadow: 0 6px 12px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
-            letter-spacing: -3px;
-        }
-
-        .title-slide .k8s-icon {
-            font-size: 140px;
-            margin: 30px 0;
-            position: relative;
-            z-index: 1;
-            animation: spin 20s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .title-slide .subtitle {
-            font-size: 36px;
-            font-weight: 300;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Content Slides */
-        .content-slide {
-            padding: 60px 80px;
-        }
-
-        .slide-header {
-            border-bottom: 4px solid #326ce5;
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-        }
-
-        .slide-header h2 {
-            font-size: 48px;
-            color: #2d3748;
+        /* Slide Header */
+        .slide-title {
+            font-size: 56px;
             font-weight: 700;
+            margin-bottom: 60px;
+            color: #326ce5;
+            border-bottom: 5px solid #326ce5;
+            padding-bottom: 20px;
         }
 
+        /* Content Area */
         .slide-content {
-            font-size: 24px;
-            line-height: 1.8;
-            color: #4a5568;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .slide-content h3 {
+            font-size: 42px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .slide-content p {
+            font-size: 32px;
+            line-height: 1.6;
+            color: #555;
         }
 
         .slide-content ul {
@@ -189,280 +141,106 @@
         }
 
         .slide-content li {
-            padding: 25px 30px;
-            margin: 18px 0;
-            background: white;
-            border-left: 6px solid #326ce5;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            font-size: 32px;
+            line-height: 1.8;
+            color: #333;
+            margin: 20px 0;
+            padding-left: 60px;
+            position: relative;
         }
 
-        .slide-content li:hover {
-            transform: translateX(15px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(50,108,229,0.15);
-            border-left-width: 8px;
+        .slide-content li:before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #326ce5;
+            font-size: 28px;
         }
 
-        .icon {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            background: #326ce5;
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .column h3 {
+            font-size: 38px;
+            color: #326ce5;
+            margin-bottom: 25px;
+        }
+
+        .column p, .column li {
+            font-size: 28px;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, #326ce5 0%, #2563eb 100%);
             color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
-            margin-right: 15px;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        /* Visual Diagram Slides */
-        .diagram-slide {
-            padding: 60px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .diagram-slide h2 {
-            font-size: 48px;
-            color: #2d3748;
-            margin-bottom: 50px;
-            text-align: center;
-        }
-
-        .architecture-diagram {
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-            width: 100%;
-        }
-
-        .control-plane {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 50px;
             border-radius: 20px;
+            text-align: center;
+        }
+
+        .highlight-box h3 {
+            font-size: 48px;
             color: white;
-            text-align: center;
-            box-shadow: 0 12px 32px rgba(102,126,234,0.3);
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 30px;
         }
 
-        .control-plane::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.05); }
-        }
-
-        .control-plane h3 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            font-weight: 700;
-        }
-
-        .control-components {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .component-box {
-            background: rgba(255,255,255,0.25);
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 16px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.3);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .component-box:hover {
-            background: rgba(255,255,255,0.35);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
-
-        .worker-nodes {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-
-        .node {
-            background: white;
-            border: 4px solid #326ce5;
-            border-radius: 16px;
-            padding: 35px 25px;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(50,108,229,0.15);
-            transition: all 0.3s ease;
-        }
-
-        .node:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 16px 32px rgba(50,108,229,0.25);
-            border-color: #2563eb;
-        }
-
-        .node h4 {
-            font-size: 26px;
-            color: #2d3748;
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
-
-        .pods {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .pod {
-            background: linear-gradient(135deg, #326ce5 0%, #5a8df7 100%);
+        .highlight-box p {
+            font-size: 32px;
             color: white;
-            padding: 18px 12px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            box-shadow: 0 4px 8px rgba(50,108,229,0.3);
-            transition: all 0.3s ease;
+            opacity: 0.95;
         }
 
-        .pod:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(50,108,229,0.4);
+        /* Gradient backgrounds for variety */
+        .slide-1 { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); }
+        .slide-2 { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); }
+        .slide-3 { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); }
+        .slide-4 { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
+        .slide-5 { background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); }
+        .slide-6 { background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%); }
+        .slide-7 { background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%); }
+        .slide-8 { background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%); }
+        .slide-9 { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
+        .slide-10 { background: linear-gradient(135deg, #326ce5 0%, #2563eb 100%); color: white; }
+
+        .slide-10 .slide-title {
+            color: white;
+            border-bottom-color: white;
         }
 
-        /* Feature Grid */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin-top: 40px;
+        .slide-10 .slide-content h3,
+        .slide-10 .slide-content p,
+        .slide-10 .slide-content li {
+            color: white;
         }
 
-        .feature-card {
-            background: white;
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            text-align: center;
-            border-top: 4px solid #326ce5;
-            transition: all 0.3s ease;
+        .slide-10 .slide-content li:before {
+            color: white;
         }
 
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 16px 32px rgba(50,108,229,0.2);
-        }
-
-        .feature-card .emoji {
-            font-size: 64px;
-            margin-bottom: 20px;
-            display: inline-block;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        .feature-card h4 {
-            font-size: 26px;
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            font-size: 18px;
-            color: #718096;
-            line-height: 1.6;
-        }
-
-        /* Timeline */
-        .timeline {
-            position: relative;
-            padding: 40px 0;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: #326ce5;
-            transform: translateX(-50%);
-        }
-
-        .timeline-item {
-            display: flex;
-            margin: 30px 0;
-            align-items: center;
-        }
-
-        .timeline-item:nth-child(odd) {
-            flex-direction: row-reverse;
-        }
-
-        .timeline-content {
-            width: 45%;
-            padding: 25px;
-            background: #f7fafc;
-            border-radius: 12px;
-            border-left: 4px solid #326ce5;
-        }
-
-        .timeline-item:nth-child(odd) .timeline-content {
-            border-left: none;
-            border-right: 4px solid #326ce5;
-        }
-
-        .timeline-dot {
-            width: 30px;
-            height: 30px;
-            background: #326ce5;
-            border-radius: 50%;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        /* Navigation - Simple arrows at edges */
+        /* Navigation */
         .nav-arrow {
             position: fixed;
             top: 50%;
             transform: translateY(-50%);
             width: 60px;
             height: 60px;
-            background: rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.3);
             border: none;
             font-size: 30px;
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1000;
             backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s ease;
         }
 
         .nav-arrow:hover {
-            background: rgba(255,255,255,0.5);
+            background: rgba(0,0,0,0.5);
         }
 
         .nav-arrow.left {
@@ -480,45 +258,18 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255,255,255,0.3);
-            padding: 10px 25px;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 30px;
             border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
             color: white;
+            font-size: 18px;
+            font-weight: 600;
             backdrop-filter: blur(10px);
+            z-index: 1000;
         }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .slide.active .slide-content li,
-        .slide.active .feature-card,
-        .slide.active .node {
-            animation: fadeInUp 0.6s ease-out backwards;
-        }
-
-        .slide.active .slide-content li:nth-child(1),
-        .slide.active .feature-card:nth-child(1) { animation-delay: 0.1s; }
-        .slide.active .slide-content li:nth-child(2),
-        .slide.active .feature-card:nth-child(2) { animation-delay: 0.2s; }
-        .slide.active .slide-content li:nth-child(3),
-        .slide.active .feature-card:nth-child(3) { animation-delay: 0.3s; }
-        .slide.active .slide-content li:nth-child(4),
-        .slide.active .feature-card:nth-child(4) { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
-    <!-- Start Screen -->
     <div class="start-screen" id="startScreen">
         <h1>Kubernetes</h1>
         <div class="k8s-icon">☸️</div>
@@ -527,215 +278,175 @@
     </div>
 
     <div class="presentation">
-        <!-- Slide 1: What is Kubernetes? -->
-        <div class="slide active content-slide">
-            <div class="slide-header">
-                <h2>What is Kubernetes?</h2>
-            </div>
+        <!-- Slide 1 -->
+        <div class="slide active slide-1">
+            <h1 class="slide-title">What is Kubernetes?</h1>
             <div class="slide-content">
+                <p>Kubernetes (K8s) is an open-source container orchestration platform that automates deployment, scaling, and management of containerized applications.</p>
                 <ul>
-                    <li><span class="icon">📦</span> <strong>Container Orchestrator</strong> - Automatically manages containerized applications</li>
-                    <li><span class="icon">🎯</span> <strong>Google Born</strong> - Based on 15+ years of Google's experience running containers</li>
-                    <li><span class="icon">🌍</span> <strong>Open Source</strong> - Maintained by Cloud Native Computing Foundation (CNCF)</li>
-                    <li><span class="icon">⚙️</span> <strong>Production Ready</strong> - Powers Netflix, Spotify, Airbnb, and thousands more</li>
+                    <li>Born at Google, based on 15+ years of experience</li>
+                    <li>Now maintained by Cloud Native Computing Foundation (CNCF)</li>
+                    <li>Industry standard for container orchestration</li>
+                    <li>Powers Netflix, Spotify, Airbnb, and thousands more</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Slide 3: The Problem Kubernetes Solves -->
-        <div class="slide content-slide">
-            <div class="slide-header">
-                <h2>Why Do We Need Kubernetes?</h2>
-            </div>
+        <!-- Slide 2 -->
+        <div class="slide slide-2">
+            <h1 class="slide-title">The Problem: Container Chaos</h1>
             <div class="slide-content">
+                <h3>Without Kubernetes:</h3>
                 <ul>
-                    <li><span class="icon">🤯</span> <strong>Too Many Containers</strong> - Managing hundreds of containers manually is impossible</li>
-                    <li><span class="icon">💥</span> <strong>Containers Crash</strong> - Need automatic recovery when things fail</li>
-                    <li><span class="icon">📈</span> <strong>Traffic Spikes</strong> - Must scale up quickly during high demand</li>
-                    <li><span class="icon">🔄</span> <strong>Updates</strong> - Deploy new versions without downtime</li>
-                    <li><span class="icon">🏗️</span> <strong>Resource Usage</strong> - Efficiently pack containers onto servers</li>
+                    <li>Managing hundreds of containers manually is impossible</li>
+                    <li>Containers crash and need manual restart</li>
+                    <li>No automatic load balancing across containers</li>
+                    <li>Scaling up/down requires manual intervention</li>
+                    <li>Rolling updates are risky and time-consuming</li>
+                    <li>No standard way to manage secrets and configs</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Slide 4: Kubernetes Architecture -->
-        <div class="slide diagram-slide">
-            <h2>Kubernetes Architecture</h2>
-            <div class="architecture-diagram">
-                <div class="control-plane">
-                    <h3>Control Plane (The Brain) 🧠</h3>
-                    <div class="control-components">
-                        <div class="component-box">
-                            <strong>API Server</strong><br>
-                            Front door
-                        </div>
-                        <div class="component-box">
-                            <strong>Scheduler</strong><br>
-                            Places pods
-                        </div>
-                        <div class="component-box">
-                            <strong>Controller</strong><br>
-                            Maintains state
-                        </div>
-                        <div class="component-box">
-                            <strong>etcd</strong><br>
-                            Data store
-                        </div>
-                    </div>
-                </div>
-                <div class="worker-nodes">
-                    <div class="node">
-                        <h4>Worker Node 1</h4>
-                        <div class="pods">
-                            <div class="pod">Pod A</div>
-                            <div class="pod">Pod B</div>
-                            <div class="pod">Pod C</div>
-                            <div class="pod">Pod D</div>
-                        </div>
-                    </div>
-                    <div class="node">
-                        <h4>Worker Node 2</h4>
-                        <div class="pods">
-                            <div class="pod">Pod E</div>
-                            <div class="pod">Pod F</div>
-                            <div class="pod">Pod G</div>
-                            <div class="pod">Pod H</div>
-                        </div>
-                    </div>
-                    <div class="node">
-                        <h4>Worker Node 3</h4>
-                        <div class="pods">
-                            <div class="pod">Pod I</div>
-                            <div class="pod">Pod J</div>
-                            <div class="pod">Pod K</div>
-                            <div class="pod">Pod L</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 5: Core Concepts -->
-        <div class="slide content-slide">
-            <div class="slide-header">
-                <h2>Core Kubernetes Concepts</h2>
-            </div>
+        <!-- Slide 3 -->
+        <div class="slide slide-3">
+            <h1 class="slide-title">The Solution: Kubernetes Automation</h1>
             <div class="slide-content">
-                <ul>
-                    <li><span class="icon">📦</span> <strong>Pod</strong> - Smallest unit: one or more containers that work together</li>
-                    <li><span class="icon">🚀</span> <strong>Deployment</strong> - Manages multiple copies of your pods</li>
-                    <li><span class="icon">🌐</span> <strong>Service</strong> - Stable network endpoint to access pods</li>
-                    <li><span class="icon">🔧</span> <strong>ConfigMap</strong> - Configuration data for your applications</li>
-                    <li><span class="icon">🔐</span> <strong>Secret</strong> - Sensitive data like passwords and API keys</li>
+                <div class="highlight-box">
+                    <h3>Kubernetes Handles It All</h3>
+                    <p>Automatic deployment, scaling, healing, and updates</p>
+                </div>
+                <ul style="margin-top: 40px;">
+                    <li>Self-healing: Automatically restarts failed containers</li>
+                    <li>Auto-scaling: Scales based on CPU, memory, or custom metrics</li>
+                    <li>Load balancing: Distributes traffic automatically</li>
+                    <li>Rolling updates: Zero-downtime deployments</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Slide 6: Kubernetes Superpowers -->
-        <div class="slide content-slide">
-            <div class="slide-header">
-                <h2>Kubernetes Superpowers</h2>
-            </div>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="emoji">🔄</div>
-                    <h4>Self-Healing</h4>
-                    <p>Automatically restarts failed containers and replaces unhealthy pods</p>
-                </div>
-                <div class="feature-card">
-                    <div class="emoji">📊</div>
-                    <h4>Auto-Scaling</h4>
-                    <p>Scales applications up or down based on CPU, memory, or custom metrics</p>
-                </div>
-                <div class="feature-card">
-                    <div class="emoji">🎯</div>
-                    <h4>Load Balancing</h4>
-                    <p>Distributes traffic evenly across all healthy pods</p>
-                </div>
-                <div class="feature-card">
-                    <div class="emoji">🚀</div>
-                    <h4>Rolling Updates</h4>
-                    <p>Deploy new versions with zero downtime and automatic rollback</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 7: Real-World Use Cases -->
-        <div class="slide content-slide">
-            <div class="slide-header">
-                <h2>Who Uses Kubernetes?</h2>
-            </div>
+        <!-- Slide 4 -->
+        <div class="slide slide-4">
+            <h1 class="slide-title">Key Concepts: Pods</h1>
             <div class="slide-content">
+                <h3>The Smallest Deployable Unit</h3>
                 <ul>
-                    <li><span class="icon">🎬</span> <strong>Netflix</strong> - Streams to 200M+ subscribers using K8s microservices</li>
-                    <li><span class="icon">🎵</span> <strong>Spotify</strong> - Manages 1000s of microservices across multiple regions</li>
-                    <li><span class="icon">✈️</span> <strong>Airbnb</strong> - Handles millions of bookings with K8s infrastructure</li>
-                    <li><span class="icon">🛒</span> <strong>eBay</strong> - Runs payment systems and search on Kubernetes</li>
-                    <li><span class="icon">🎮</span> <strong>Pokémon GO</strong> - Scaled to 500M users in days thanks to K8s</li>
+                    <li><strong>What:</strong> A pod is one or more containers that run together</li>
+                    <li><strong>Why:</strong> Containers in a pod share network and storage</li>
+                    <li><strong>Example:</strong> Web app + logging sidecar in one pod</li>
+                    <li><strong>Lifecycle:</strong> Pods are ephemeral - can be created/destroyed anytime</li>
+                    <li><strong>Reality:</strong> You rarely create pods directly</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Slide 8: Getting Started Journey -->
-        <div class="slide content-slide">
-            <div class="slide-header">
-                <h2>Getting Started with Kubernetes</h2>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <h4 style="font-size: 24px; margin-bottom: 10px;">1️⃣ Learn Containers</h4>
-                        <p style="font-size: 18px;">Master Docker basics first - containers are K8s building blocks</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <h4 style="font-size: 24px; margin-bottom: 10px;">2️⃣ Try Minikube</h4>
-                        <p style="font-size: 18px;">Run Kubernetes locally on your laptop for learning</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <h4 style="font-size: 24px; margin-bottom: 10px;">3️⃣ Deploy an App</h4>
-                        <p style="font-size: 18px;">Start with a simple app - deploy, scale, update</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <h4 style="font-size: 24px; margin-bottom: 10px;">4️⃣ Go Production</h4>
-                        <p style="font-size: 18px;">Use managed K8s (GKE, EKS, AKS) or HPE GreenLake</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 9: Key Takeaways -->
-        <div class="slide content-slide">
-            <div class="slide-header">
-                <h2>Key Takeaways</h2>
-            </div>
+        <!-- Slide 5 -->
+        <div class="slide slide-5">
+            <h1 class="slide-title">Key Concepts: Deployments</h1>
             <div class="slide-content">
+                <h3>Manage Your Application Lifecycle</h3>
                 <ul>
-                    <li><span class="icon">✅</span> Kubernetes automates container management at scale</li>
-                    <li><span class="icon">✅</span> Self-healing, auto-scaling, and rolling updates built-in</li>
-                    <li><span class="icon">✅</span> Industry standard - used by tech giants worldwide</li>
-                    <li><span class="icon">✅</span> Works anywhere - on-prem, cloud, or hybrid</li>
-                    <li><span class="icon">✅</span> Start small, scale as you learn</li>
+                    <li><strong>What:</strong> Manages a set of identical pods (replicas)</li>
+                    <li><strong>Why:</strong> Ensures desired number of pods are always running</li>
+                    <li><strong>Features:</strong> Rolling updates, rollbacks, scaling</li>
+                    <li><strong>Example:</strong> "Run 5 copies of my web app"</li>
+                    <li><strong>Use case:</strong> Perfect for stateless applications</li>
                 </ul>
             </div>
         </div>
-    </div>
 
-    <div class="slide-counter">
-        <span id="current-slide">1</span> / <span id="total-slides">9</span>
+        <!-- Slide 6 -->
+        <div class="slide slide-6">
+            <h1 class="slide-title">Key Concepts: Services</h1>
+            <div class="slide-content">
+                <h3>Stable Networking for Pods</h3>
+                <ul>
+                    <li><strong>Problem:</strong> Pods have dynamic IPs that change</li>
+                    <li><strong>Solution:</strong> Service provides a stable endpoint</li>
+                    <li><strong>ClusterIP:</strong> Internal access only (default)</li>
+                    <li><strong>LoadBalancer:</strong> External access with cloud LB</li>
+                    <li><strong>NodePort:</strong> Exposes service on each node's IP</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="slide slide-7">
+            <h1 class="slide-title">Architecture Overview</h1>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Control Plane</h3>
+                        <ul>
+                            <li>API Server: Gateway to cluster</li>
+                            <li>Scheduler: Assigns pods to nodes</li>
+                            <li>Controller Manager: Maintains state</li>
+                            <li>etcd: Stores cluster data</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Worker Nodes</h3>
+                        <ul>
+                            <li>kubelet: Runs containers</li>
+                            <li>kube-proxy: Network rules</li>
+                            <li>Container Runtime: Docker/containerd</li>
+                            <li>Pods: Your applications</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="slide slide-8">
+            <h1 class="slide-title">Why Kubernetes Wins</h1>
+            <div class="slide-content">
+                <ul>
+                    <li><strong>Portable:</strong> Runs anywhere - cloud, on-prem, hybrid</li>
+                    <li><strong>Declarative:</strong> Describe what you want, K8s makes it happen</li>
+                    <li><strong>Scalable:</strong> From 1 to 5,000+ nodes</li>
+                    <li><strong>Extensible:</strong> Custom resources, operators, plugins</li>
+                    <li><strong>Community:</strong> Largest open-source community in cloud native</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="slide slide-9">
+            <h1 class="slide-title">Getting Started</h1>
+            <div class="slide-content">
+                <ul>
+                    <li><strong>Local Dev:</strong> Minikube, Kind, Docker Desktop</li>
+                    <li><strong>Managed K8s:</strong> GKE, EKS, AKS, OpenShift</li>
+                    <li><strong>Learn:</strong> kubernetes.io/docs and interactive tutorials</li>
+                    <li><strong>Practice:</strong> Deploy a simple app, add services, scale it</li>
+                    <li><strong>Tip:</strong> Start small, learn the basics, then go advanced</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="slide slide-10">
+            <h1 class="slide-title">Ready to Master Kubernetes?</h1>
+            <div class="slide-content">
+                <div class="highlight-box" style="background: rgba(255,255,255,0.2);">
+                    <h3>Your Cloud Native Journey Starts Here</h3>
+                    <p>Kubernetes is the foundation of modern cloud infrastructure</p>
+                </div>
+                <ul style="margin-top: 40px;">
+                    <li>Visit kubernetes.io for official documentation</li>
+                    <li>Try hands-on labs and tutorials</li>
+                    <li>Join the CNCF community and Slack channels</li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <button class="nav-arrow left" onclick="previousSlide()">‹</button>
     <button class="nav-arrow right" onclick="nextSlide()">›</button>
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">10</span>
+    </div>
 
     <script>
         function startPresentation() {
@@ -746,13 +457,11 @@
         const slides = document.querySelectorAll('.slide');
         const totalSlides = slides.length;
 
-        document.getElementById('total-slides').textContent = totalSlides;
-
         function showSlide(n) {
             slides[currentSlide].classList.remove('active');
             currentSlide = (n + totalSlides) % totalSlides;
             slides[currentSlide].classList.add('active');
-            document.getElementById('current-slide').textContent = currentSlide + 1;
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
         }
 
         function nextSlide() {
@@ -764,11 +473,8 @@
         }
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                previousSlide();
-            }
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
         });
     </script>
 </body>
