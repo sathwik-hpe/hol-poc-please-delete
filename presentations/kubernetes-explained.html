@@ -17,6 +17,60 @@
             overflow: hidden;
         }
 
+        /* Start Screen */
+        .start-screen {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #326ce5 0%, #2563eb 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 2000;
+        }
+
+        .start-screen.hidden {
+            display: none;
+        }
+
+        .start-screen h1 {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .start-screen .k8s-icon {
+            font-size: 120px;
+            margin: 30px 0;
+        }
+
+        .start-screen p {
+            font-size: 32px;
+            margin-bottom: 50px;
+            opacity: 0.9;
+        }
+
+        .start-btn {
+            padding: 20px 60px;
+            font-size: 24px;
+            background: white;
+            color: #326ce5;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        }
+
         .presentation {
             width: 100vw;
             height: 100vh;
@@ -392,48 +446,49 @@
             transform: translateX(-50%);
         }
 
-        /* Navigation */
-        .nav-controls {
+        /* Navigation - Simple arrows at edges */
+        .nav-arrow {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .nav-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.95);
-            border: 2px solid #326ce5;
-            border-radius: 8px;
-            font-size: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            font-size: 30px;
+            color: white;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             transition: all 0.3s ease;
+            z-index: 1000;
             backdrop-filter: blur(10px);
         }
 
-        .nav-btn:hover {
-            background: #326ce5;
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(50,108,229,0.3);
+        .nav-arrow:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .nav-arrow.left {
+            left: 0;
+            border-radius: 0 30px 30px 0;
+        }
+
+        .nav-arrow.right {
+            right: 0;
+            border-radius: 30px 0 0 30px;
         }
 
         .slide-counter {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255,255,255,0.95);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.3);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 16px;
             font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            color: white;
             backdrop-filter: blur(10px);
-            border: 2px solid #326ce5;
         }
 
         /* Animations */
@@ -465,6 +520,14 @@
     </style>
 </head>
 <body>
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <h1>Kubernetes</h1>
+        <div class="k8s-icon">☸️</div>
+        <p>Container Orchestration Made Simple</p>
+        <button class="start-btn" onclick="startPresentation()">Start Presentation →</button>
+    </div>
+
     <div class="presentation">
         <!-- Slide 1: Title -->
         <div class="slide active title-slide">
@@ -692,12 +755,14 @@
         <span id="current-slide">1</span> / <span id="total-slides">10</span>
     </div>
 
-    <div class="nav-controls">
-        <button class="nav-btn" onclick="previousSlide()">←</button>
-        <button class="nav-btn" onclick="nextSlide()">→</button>
-    </div>
+    <button class="nav-arrow left" onclick="previousSlide()">‹</button>
+    <button class="nav-arrow right" onclick="nextSlide()">›</button>
 
     <script>
+        function startPresentation() {
+            document.getElementById('startScreen').classList.add('hidden');
+        }
+
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
         const totalSlides = slides.length;
