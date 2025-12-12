@@ -1,6 +1,6 @@
 # Python for AWS Cloud (boto3) ☁️
 
-## Why This Matters for Fidelity Role
+## Why This Matters for Target Company Role
 The job requires **"experience with cloud APIs such as AWS and Azure"** and **"automating cloud infrastructure provisioning"**. boto3 is Python's AWS SDK - **THIS IS CRITICAL**.
 
 ---
@@ -1048,7 +1048,7 @@ def find_unused_network_resources(region: str = 'us-east-1') -> Dict:
 
 ---
 
-## Key Takeaways for Fidelity Interview
+## Key Takeaways for Target Company Interview
 
 ✅ **Know boto3 Clients vs Resources**: Clients are low-level, Resources are OOP  
 ✅ **Error Handling**: Always use try/except with `ClientError`  

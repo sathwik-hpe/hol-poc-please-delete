@@ -1,7 +1,7 @@
 # AWS CloudFormation (Infrastructure as Code) ☁️
 
 ## Why This Matters
-Fidelity requires **"Terraform and AWS CloudFormation"**. CF is AWS-native IaC.
+Target Company requires **"Terraform and AWS CloudFormation"**. CF is AWS-native IaC.
 
 ---
 

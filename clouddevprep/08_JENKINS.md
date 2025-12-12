@@ -1,6 +1,6 @@
 # Jenkins CI/CD Pipelines 🚀
 
-## Critical for Fidelity
+## Critical for Target Company
 Job requires **"Jenkins for CI/CD"** - This is how you'll deploy infrastructure!
 
 ---

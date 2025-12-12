@@ -1,7 +1,7 @@
 # Python for Azure Cloud (Azure SDK) ☁️
 
 ## Why This Matters
-Fidelity requires **"experience with AWS and Azure cloud APIs"**. While you have AWS experience, **Azure is a GAP**. This is CRITICAL to learn.
+Target Company requires **"experience with AWS and Azure cloud APIs"**. While you have AWS experience, **Azure is a GAP**. This is CRITICAL to learn.
 
 ---
 

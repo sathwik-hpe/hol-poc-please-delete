@@ -1,6 +1,6 @@
 # Python OOP Deep Dive 🐍
 
-## Why This Matters for Fidelity Role
+## Why This Matters for Target Company Role
 The job requires **"2+ years of hands-on experience with Python as your primary language"** and **"4+ years building enterprise-level software using OOP principles"**. This is CRITICAL for the Cloud Network team.
 
 ---
@@ -177,7 +177,7 @@ provision_network(aws, '10.0.0.0/16')    # Works with AWS
 provision_network(azure, '10.1.0.0/16')  # Works with Azure
 ```
 
-**Fidelity Connection**: Multi-cloud support (AWS + Azure) requires polymorphic design!
+**Target Company Connection**: Multi-cloud support (AWS + Azure) requires polymorphic design!
 
 ---
 
@@ -885,7 +885,7 @@ print(MultiCloudResource.__mro__)  # Show method resolution order
 
 ---
 
-## Key Takeaways for Fidelity Interview
+## Key Takeaways for Target Company Interview
 
 ✅ **Demonstrate Enterprise Thinking**: Show you understand large-scale systems, not just scripts  
 ✅ **Use Real Examples**: Reference your HPE platform engineering, 900+ deployments  
@@ -902,5 +902,5 @@ print(MultiCloudResource.__mro__)  # Show method resolution order
 ---
 
 **Related Documents**:
-- [01_SKILLS_REQUIRED.md](./01_SKILLS_REQUIRED.md) - Overview of all Fidelity requirements
+- [01_SKILLS_REQUIRED.md](./01_SKILLS_REQUIRED.md) - Overview of all Target Company requirements
 - Coming next: Python for Cloud (AWS boto3)

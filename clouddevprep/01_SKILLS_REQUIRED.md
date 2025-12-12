@@ -1,6 +1,6 @@
-# Fidelity Senior Cloud Developer - Required Skills Breakdown
+# Senior Cloud Developer - Required Skills Breakdown
 
-## 🎯 What Fidelity Is Looking For
+## 🎯 What Target Company Is Looking For
 
 Based on the job description, here are ALL the skills they want, organized by importance:
 
@@ -137,7 +137,7 @@ Based on the job description, here are ALL the skills they want, organized by im
 - Gap: Azure networking concepts and services
 
 **What This Means for the Role**:
-- Fidelity uses both AWS and Azure
+- Target Company uses both AWS and Azure
 - Need to design networks in both clouds
 - Understand differences and similarities
 
@@ -266,7 +266,7 @@ Based on the job description, here are ALL the skills they want, organized by im
 
 3. **Platform Engineering** (HPE Silvercreek)
    - Built infrastructure for $1B+ contracts
-   - Exactly the scale Fidelity operates at
+   - Exactly the scale Target Company operates at
 
 4. **Observability & Monitoring** (Fluent, Elasticsearch, Kibana)
    - Critical for network troubleshooting
@@ -335,7 +335,7 @@ Based on the job description, here are ALL the skills they want, organized by im
 
 ## SKILL PRIORITY MATRIX
 
-| Skill | Fidelity Priority | Your Current Level | Gap Size | Study Hours Needed |
+| Skill | Target Company Priority | Your Current Level | Gap Size | Study Hours Needed |
 |-------|-------------------|-------------------|----------|-------------------|
 | **Python (Advanced)** | ⭐⭐⭐⭐⭐ | 🟡 Intermediate | 🔴 Large | 20 hours |
 | **AWS VPC Networking** | ⭐⭐⭐⭐⭐ | 🟡 Intermediate | 🔴 Large | 25 hours |
@@ -424,7 +424,7 @@ Based on the job description, here are ALL the skills they want, organized by im
 2. **Read Document 3** (Interview Questions) - Practice Q&A
 3. **Start with Priority 1 skills** - Python, AWS VPC, Terraform
 4. **Build portfolio projects** - Demonstrate competency
-5. **Practice explaining your experience** - Connect HPE work to Fidelity needs
+5. **Practice explaining your experience** - Connect HPE work to Target Company needs
 
 ---
 

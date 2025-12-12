@@ -1,8 +1,8 @@
 # AWS Networking Deep Dive 🌐
 
-## Critical for Fidelity Cloud Network Team
+## Critical for Cloud Network Team
 
-This is **YOUR CORE RESPONSIBILITY** at Fidelity. Master these concepts!
+This is **YOUR CORE RESPONSIBILITY** at Target Company. Master these concepts!
 
 ---
 

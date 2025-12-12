@@ -1,6 +1,6 @@
 # Terraform Advanced (Infrastructure as Code) 🏗️
 
-## Critical for Fidelity Role
+## Critical for Target Company Role
 
 Job requires **"Terraform and AWS CloudFormation"** - Terraform is ESSENTIAL!
 

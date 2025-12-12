@@ -1,7 +1,7 @@
 # Networking Fundamentals 🌐
 
 ## Critical for Cloud Network Team
-Fidelity requires **"understanding of IP routing, firewalls, load balancers, DNS"**
+Target Company requires **"understanding of IP routing, firewalls, load balancers, DNS"**
 
 ---
 
